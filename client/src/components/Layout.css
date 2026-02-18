@@ -56,6 +56,27 @@
   margin-bottom: 1.25rem;
 }
 
+.footer-trust {
+  font-size: 0.8125rem;
+  color: var(--textMuted);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 480px;
+}
+
+.footer-trust-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--textMuted);
+}
+
+.footer-trust-icon svg {
+  display: block;
+}
+
 .footer-links {
   font-size: 0.8125rem;
   color: var(--textMuted);
@@ -85,4 +106,9 @@
 .footer-logo {
   font-weight: 600;
   color: var(--text);
+}
+
+.footer-copy,
+.footer-year {
+  color: var(--textMuted);
 }

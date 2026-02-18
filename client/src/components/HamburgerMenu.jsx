@@ -40,9 +40,11 @@ export function HamburgerMenu({ open, onClose, theme, onThemeChange, signedIn, o
             </>
           )}
           <div className="hamburger-divider" aria-hidden />
+          <Link to="/documents" className="hamburger-item" onClick={onClose}>Documents</Link>
           <Link to="/download" className="hamburger-item" onClick={onClose}>Download</Link>
           <Link to="/pricing" className="hamburger-item" onClick={onClose}>Pricing</Link>
-          <Link to="/terms" className="hamburger-item" onClick={onClose}>Terms of Service</Link>
+          <Link to="/terms" className="hamburger-item" onClick={onClose}>Terms</Link>
+          <Link to="/privacy" className="hamburger-item" onClick={onClose}>Privacy</Link>
           <div className="hamburger-divider" aria-hidden />
           <div className="hamburger-item hamburger-theme">
             <span className="hamburger-theme-label">Theme</span>

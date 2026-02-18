@@ -30,7 +30,7 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>5. Data and Privacy</h2>
-          <p>We process your uploaded files to provide the Service. We do not sell your data. Our Privacy Policy describes how we collect and use information.</p>
+          <p>We process your uploaded files to provide the Service. We do not sell your data. Our <Link to="/privacy">Privacy Policy</Link> describes how we collect and use information.</p>
         </section>
 
         <section className="terms-section">

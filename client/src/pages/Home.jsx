@@ -1,10 +1,20 @@
-import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
 import { UploadZone } from '../components/UploadZone';
-import { FeedbackSection } from '../components/FeedbackSection';
 import { NerdyHints } from '../components/NerdyHints';
-import { downloadYardiJeTemplate, downloadTrialBalanceTemplate, downloadBalanceSheetTemplate, downloadRealEstateGLReference } from '../lib/yardiExport';
 import '../App.css';
+
+const OPEN_DOC_KEY = 'docyard_open_doc';
+
+function getInitialDocument() {
+  try {
+    const raw = sessionStorage.getItem(OPEN_DOC_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(OPEN_DOC_KEY);
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
 
 function getCurrentPostMonth() {
   const d = new Date();
@@ -22,6 +32,22 @@ function getLastDayOfMonthYmd(postMonth) {
 export function Home() {
   const [exportPostMonth, setExportPostMonth] = useState(getCurrentPostMonth);
   const [exportJournalDate, setExportJournalDate] = useState(() => getLastDayOfMonthYmd(getCurrentPostMonth()));
+  const [initialDocument, setInitialDocument] = useState(null);
+
+  useEffect(() => {
+    const doc = getInitialDocument();
+    if (doc) {
+      setInitialDocument(doc);
+      if (doc.postMonth) setExportPostMonth(doc.postMonth);
+      if (doc.journalDate) setExportJournalDate(doc.journalDate);
+    }
+  }, []);
+
+  const onLoadDocument = useCallback((doc) => {
+    if (doc?.postMonth) setExportPostMonth(doc.postMonth);
+    if (doc?.journalDate) setExportJournalDate(doc.journalDate);
+    setInitialDocument(null);
+  }, []);
 
   const onPostMonthFromFile = useCallback((period) => {
     if (period) {
@@ -31,8 +57,8 @@ export function Home() {
   }, []);
 
   return (
-    <div className="home-page">
-      <p className="home-intro">Trial balance → journal entry. Works offline in your browser. Set post month and date, upload Excel, get an import-ready file.</p>
+    <div className="home-page home-page--input">
+      <p className="home-intro">Upload your file. We detect trial balance or balance sheet and return an import-ready journal entry. Processed locally in your browser—your data is not uploaded.</p>
       <NerdyHints />
       <UploadZone
         postMonth={exportPostMonth}
@@ -40,35 +66,9 @@ export function Home() {
         journalDate={exportJournalDate}
         setJournalDate={setExportJournalDate}
         onPostMonthFromFile={onPostMonthFromFile}
+        initialDocument={initialDocument}
+        onLoadDocument={onLoadDocument}
       />
-      <section className="templates-section">
-        <div className="templates-line" />
-        <p className="templates-title">Excel templates</p>
-        <p className="templates-hint">Blank templates and a GL reference for property accounting.</p>
-        <div className="templates-buttons">
-          <button type="button" className="btn btn-ghost btn-template" onClick={downloadYardiJeTemplate}>
-            Journal entry template
-          </button>
-          <button type="button" className="btn btn-ghost btn-template" onClick={downloadTrialBalanceTemplate}>
-            Trial balance template
-          </button>
-          <button type="button" className="btn btn-ghost btn-template" onClick={downloadBalanceSheetTemplate}>
-            Balance sheet template
-          </button>
-          <button type="button" className="btn btn-ghost btn-template" onClick={downloadRealEstateGLReference}>
-            Real estate GL reference
-          </button>
-        </div>
-      </section>
-      <section className="home-cta">
-        <div className="home-cta-line" />
-        <p className="home-cta-text">Free now. Payments soon.</p>
-        <div className="home-cta-buttons">
-          <Link to="/pricing" className="btn btn-primary btn-cta">Pricing</Link>
-          <Link to="/download" className="btn btn-ghost btn-cta">Download app</Link>
-        </div>
-      </section>
-      <FeedbackSection />
     </div>
   );
 }

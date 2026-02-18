@@ -67,7 +67,7 @@ export function Layout() {
             <img src="/icon.png" alt="" className="app-icon" width="40" height="40" />
             <h1 className="app-logo">DocYard</h1>
           </div>
-          <p className="app-value">Your perfect tool for property accounting. Trial balance to journal entry, offline. Not affiliated with any third-party software.</p>
+          <p className="app-value">Secure property accounting. Trial balance to journal entry—processed in your browser. Not affiliated with any third-party software.</p>
         </Link>
       </header>
 
@@ -87,17 +87,29 @@ export function Layout() {
 
       <footer className="app-footer">
         <div className="footer-line" />
+        <p className="footer-trust">
+          <span className="footer-trust-icon" aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          Your file is processed in your browser and is not uploaded to our servers.
+        </p>
         <div className="footer-links">
           <Link to="/">Home</Link>
           <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/download">Download</Link>
+          <Link to="/terms">Terms</Link>
+          <span className="footer-dot" aria-hidden>·</span>
+          <Link to="/privacy">Privacy</Link>
           <span className="footer-dot" aria-hidden>·</span>
           <Link to="/pricing">Pricing</Link>
           <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/terms">Terms of Service</Link>
+          <Link to="/documents">Documents</Link>
+          <span className="footer-dot" aria-hidden>·</span>
+          <Link to="/download">Download</Link>
         </div>
         <div className="footer-bottom">
           <span className="footer-logo">DocYard</span>
+          <span className="footer-copy"> · Secure property accounting</span>
+          <span className="footer-year"> · © {new Date().getFullYear()}</span>
         </div>
       </footer>
     </div>

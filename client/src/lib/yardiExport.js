@@ -287,26 +287,27 @@ export function parseExcelFile(file) {
 }
 
 /**
- * Build Yardi JE rows and return an Excel file as a Blob (runs in browser, no server).
- * options.docType: 'trial_balance' | 'balance_sheet' | 'auto' (default: auto-detect).
+ * Get Yardi JE rows (2D array) for preview or export. Same options as buildYardiJeExcel.
  */
-export function buildYardiJeExcel(rows, options = {}) {
+export function getYardiJeRows(rows, options = {}) {
   const { postMonth, journalDate, docType = 'auto' } = options;
   const journalDateMmDdYyyy = journalDate ? ymdToMmDdYyyy(journalDate) : null;
   const opts = { postMonth: postMonth || undefined, journalDate: journalDateMmDdYyyy || undefined };
 
-  let exportRows;
   const useTrialBalance = docType === 'trial_balance' || (docType === 'auto' && findTrialBalanceHeaderRow(rows) >= 0);
   const useBalanceSheet = docType === 'balance_sheet' || (docType === 'auto' && findBalanceSheetHeaderRow(rows) >= 0);
 
-  if (useTrialBalance) {
-    exportRows = buildYardiJeRowsFromTrialBalance(rows, opts);
-  } else if (useBalanceSheet) {
-    exportRows = buildYardiJeRowsFromBalanceSheet(rows, opts);
-  } else {
-    throw new Error('Could not detect trial balance or balance sheet layout. Need columns like Account, Debit/Credit (or Balance).');
-  }
+  if (useTrialBalance) return buildYardiJeRowsFromTrialBalance(rows, opts);
+  if (useBalanceSheet) return buildYardiJeRowsFromBalanceSheet(rows, opts);
+  throw new Error('Could not detect trial balance or balance sheet layout. Need columns like Account, Debit/Credit (or Balance).');
+}
 
+/**
+ * Build Yardi JE rows and return an Excel file as a Blob (runs in browser, no server).
+ * options.docType: 'trial_balance' | 'balance_sheet' | 'auto' (default: auto-detect).
+ */
+export function buildYardiJeExcel(rows, options = {}) {
+  const exportRows = getYardiJeRows(rows, options);
   const ws = XLSX.utils.aoa_to_sheet(exportRows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, YARDI_JE_SHEET_NAME);

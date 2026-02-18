@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   parseExcelFile,
   buildYardiJeExcel,
   downloadBlob,
-  ymdToMmDdYyyy,
 } from '../lib/yardiExport.js';
+import { ParsePreviewTable } from './ParsePreviewTable.jsx';
 
 /** "01/2025" → last day as "YYYY-MM-DD" */
 function getLastDayOfMonthYmdLocal(postMonth) {
@@ -20,19 +20,31 @@ const DOC_TYPES = [
   { value: 'balance_sheet', label: 'Balance sheet' },
 ];
 
-export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDate, onPostMonthFromFile }) {
+export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDate, onPostMonthFromFile, initialDocument, onLoadDocument }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [dragging, setDragging] = useState(false);
   const [docType, setDocType] = useState('auto');
   const [detectedType, setDetectedType] = useState(null);
+  const [downloadImmediately, setDownloadImmediately] = useState(true);
+  const [parsedRows, setParsedRows] = useState(null);
   const fileRef = useRef();
+
+  useEffect(() => {
+    if (!initialDocument?.parsedRows?.length || !onLoadDocument) return;
+    const rows = initialDocument.parsedRows.map((r) => (Array.isArray(r) ? [...r] : [r]));
+    setParsedRows(rows);
+    setDocType(initialDocument.docType || 'auto');
+    setDetectedType(initialDocument.detectedType ?? null);
+    onLoadDocument(initialDocument);
+  }, [initialDocument, onLoadDocument]);
 
   const handleFile = async (file) => {
     setError('');
     setSuccess('');
     setDetectedType(null);
+    setParsedRows(null);
     setLoading(true);
     try {
       const { rows, detectedPeriod, detectedType: dt } = await parseExcelFile(file);
@@ -41,14 +53,18 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
       if (dt) setDetectedType(dt);
       if (detectedPeriod && onPostMonthFromFile) onPostMonthFromFile(String(detectedPeriod).trim());
 
-      const blob = buildYardiJeExcel(rows, {
-        postMonth: postMonth || undefined,
-        journalDate: journalDate || undefined,
-        docType: docType === 'auto' ? 'auto' : docType,
-      });
-      downloadBlob(blob, 'yardi_je_import.xlsx');
-      setSuccess('Downloaded.');
-      setTimeout(() => setSuccess(''), 5000);
+      setParsedRows(rows.map((row) => (Array.isArray(row) ? [...row] : [row])));
+
+      if (downloadImmediately) {
+        const blob = buildYardiJeExcel(rows, {
+          postMonth: postMonth || undefined,
+          journalDate: journalDate || undefined,
+          docType: docType === 'auto' ? 'auto' : docType,
+        });
+        downloadBlob(blob, 'yardi_je_import.xlsx');
+        setSuccess('Downloaded.');
+        setTimeout(() => setSuccess(''), 5000);
+      }
     } catch (e) {
       setError(e.message || 'Something went wrong');
     } finally {
@@ -74,7 +90,18 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
 
   return (
     <div className="card upload-card">
-      <p className="upload-flow-hint">Set post month and date, then drop your trial balance Excel.</p>
+      <p className="upload-flow-hint">Set post month and date, then drop your file.</p>
+      <div className="upload-option download-immediately-row">
+        <label className="download-immediately-label">
+          <input
+            type="checkbox"
+            checked={downloadImmediately}
+            onChange={(e) => setDownloadImmediately(e.target.checked)}
+          />
+          <span>Download immediately</span>
+        </label>
+        <span className="download-immediately-hint">When off, you’ll see the parsed table and Yardi preview before exporting.</span>
+      </div>
       <div className="doc-type-row">
         <label htmlFor="doc-type">Document type</label>
         <select
@@ -145,7 +172,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
         ) : (
           <>
             <div className="label">Drop Excel file or click to upload</div>
-            <div className="hint">Trial balance Excel · works offline</div>
+            <div className="hint">Trial balance or balance sheet · processed in your browser, not sent to our servers</div>
           </>
         )}
       </div>
@@ -156,6 +183,17 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
       )}
       {error && <p className="error-msg" role="alert">{error}</p>}
       {success && <p className="success-msg" role="status">{success}</p>}
+
+      {parsedRows && parsedRows.length > 0 && (
+        <ParsePreviewTable
+          parsedRows={parsedRows}
+          setParsedRows={setParsedRows}
+          docType={docType}
+          postMonth={postMonth}
+          journalDate={journalDate}
+          detectedType={detectedType}
+        />
+      )}
     </div>
   );
 }
