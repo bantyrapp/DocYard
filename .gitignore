@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Build output
+dist/
+build/
+client/dist/
+
+# Logs and debug
+logs/
+*.log
+npm-debug.log*
+
+# OS and editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Vite
+client/node_modules/.vite/
+
+# Server data (stats, feedback - local only)
+server/data/
+
+# Test artifacts
+test-export.xlsx

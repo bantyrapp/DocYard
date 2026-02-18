@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.jsx","./src/vite-env.d.ts","./src/components/createfromprompt.jsx","./src/components/descriptionpanel.jsx","./src/components/exportbar.jsx","./src/components/feedbacksection.jsx","./src/components/spreadsheet.jsx","./src/components/uploadzone.jsx","./src/components/ui/monthyearpicker.tsx","./src/lib/utils.ts"],"errors":true,"version":"5.6.3"}

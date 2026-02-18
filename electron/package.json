@@ -1,0 +1,30 @@
+{
+  "name": "docyard-app",
+  "version": "1.0.0",
+  "description": "DocYard desktop app",
+  "main": "main.js",
+  "author": "DocYard",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.docyard.app",
+    "productName": "DocYard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": ["main.js"],
+    "win": { "target": "nsis" },
+    "mac": { "target": "dmg", "category": "public.app-category.finance" },
+    "linux": { "target": "AppImage" }
+  }
+}
