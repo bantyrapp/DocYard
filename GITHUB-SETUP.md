@@ -1,5 +1,7 @@
 # Connect this project to GitHub
 
+**Status:** Git is installed, repo is initialized, and the first commit is done. You only need to create the repo on GitHub and push.
+
 ## 1. Sign in to GitHub in your browser
 
 1. Open **[https://github.com](https://github.com)** in your browser.
@@ -21,30 +23,25 @@
 
 ---
 
-## 3. Connect this folder to the new repo
+## 3. Connect and push (one-time)
 
-GitHub will show “Quick setup” with a repo URL like  
-`https://github.com/YOUR_USERNAME/REPO_NAME.git`  
-or  
-`git@github.com:YOUR_USERNAME/REPO_NAME.git`.
+GitHub will show **“Quick setup”** with a repo URL like  
+`https://github.com/YOUR_USERNAME/REPO_NAME.git`
 
-**Option A – Using Git in a terminal (if Git is installed):**
+**In PowerShell or Git Bash** (from this folder):
 
 ```powershell
 cd "c:\Users\AustinDuffy\Desktop\Work\AP\HFUF"
 
-# If this folder is not yet a git repo:
-git init
-
-# Add GitHub as the remote (replace with YOUR repo URL from step 2):
+# Add your new repo as remote (paste YOUR URL from GitHub):
 git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
 
-# Stage and commit everything, then push:
-git add .
-git commit -m "Initial commit – DocYard property accounting app"
-git branch -M main
+# Push (you may be prompted to sign in to GitHub in the browser):
 git push -u origin main
 ```
+
+Or run the script (it will ask for the URL once):  
+`.\push-to-github.ps1`
 
 **Option B – Using GitHub Desktop:**
 
