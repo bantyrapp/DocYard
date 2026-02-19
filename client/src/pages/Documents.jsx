@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDocuments, deleteDocument, updateDocument, duplicateDocument, formatDocType, formatDateTime } from '../lib/documents.js';
-import { buildYardiJeExcel, downloadBlob } from '../lib/yardiExport.js';
+import { getDocuments, deleteDocument, updateDocument, duplicateDocument, formatDocType, formatDateTime, formatRelativeTime } from '../lib/documents.js';
+import { buildYardiJeExcel, downloadBlob, getYardiJeRows, downloadCsv } from '../lib/yardiExport.js';
 import '../App.css';
 
 const SORT_OPTIONS = [
@@ -92,8 +92,23 @@ export function Documents() {
         journalDate: doc.journalDate || undefined,
         docType: doc.docType || 'auto',
       });
-      const name = (doc.label || 'yardi_export').replace(/[^\w\s-]/g, '') + '_yardi.xlsx';
-      downloadBlob(blob, name);
+      const base = (doc.label || 'yardi_export').replace(/[^\w\s-]/g, '');
+      downloadBlob(blob, `${base}_yardi.xlsx`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDownloadCsv = (doc) => {
+    if (!doc.parsedRows?.length) return;
+    try {
+      const rows = getYardiJeRows(doc.parsedRows, {
+        postMonth: doc.postMonth || undefined,
+        journalDate: doc.journalDate || undefined,
+        docType: doc.docType || 'auto',
+      });
+      const base = (doc.label || 'export').replace(/[^\w\s-]/g, '');
+      downloadCsv(rows, `${base}_yardi.csv`);
     } catch (e) {
       console.error(e);
     }
@@ -139,12 +154,12 @@ export function Documents() {
       <div className="page-inner documents-inner">
         <header className="documents-header">
           <h1 className="documents-title">Documents</h1>
-          <p className="documents-intro">Your saved exports. Search or sort below.</p>
+          <p className="documents-intro">Saved documents: parsed trial balances and Yardi journal entry exports. Search or sort below.</p>
         </header>
         {docs.length === 0 ? (
           <div className="documents-empty">
             <p className="documents-empty-text">No documents yet.</p>
-            <p className="documents-empty-hint">Upload a file, then use &quot;Save to Documents&quot; on the parse preview.</p>
+            <p className="documents-empty-hint">On Home, upload a file; then in the parse preview click Save to Documents to save it here.</p>
           </div>
         ) : (
           <>
@@ -222,12 +237,17 @@ export function Documents() {
                   <p className="document-card-meta">
                     <span className="document-card-type">{formatDocType(doc.type)}</span>
                     {doc.postMonth && <span className="document-card-period"> · {doc.postMonth}</span>}
-                    <span className="document-card-date"> · Updated {formatDateTime(doc.updatedAt)}</span>
+                  </p>
+                  <p className="document-card-dates-line">
+                    <span title={formatDateTime(doc.createdAt)}>Created {formatRelativeTime(doc.createdAt)}</span>
+                    <span className="document-card-dates-sep"> · </span>
+                    <span title={formatDateTime(doc.updatedAt)}>Updated {formatRelativeTime(doc.updatedAt)}</span>
                   </p>
                 </div>
                 <div className="document-card-actions">
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleOpen(doc)}>Open</button>
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleDownload(doc)}>Download</button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleDownload(doc)}>Excel</button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleDownloadCsv(doc)} title="For Google Sheets import">CSV</button>
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleDuplicate(doc)} title="Duplicate">Duplicate</button>
                       <button type="button" className="btn btn-ghost btn-sm document-delete-btn" onClick={() => handleDelete(doc.id)}>Delete</button>
                     </div>

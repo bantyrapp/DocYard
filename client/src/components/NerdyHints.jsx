@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 const HINTS = [
-  { text: 'Excel .xlsx or .xls only. First row = headers.', tag: 'format' },
-  { text: 'Debits = credits. Always.', tag: 'accounting' },
-  { text: 'Post month = period (MM/YYYY). Journal date = entry date.', tag: 'accounting' },
-  { text: 'Runs in your browser. Your file never hits our server.', tag: 'privacy' },
-  { text: 'Trial balance columns: Account, Description, Debit, Credit (or similar).', tag: 'format' },
-  { text: '// TODO: reconcile with GL before posting', tag: 'code' },
-  { text: 'Last day of month is auto-filled from post month.', tag: 'accounting' },
-  { text: 'Import-ready output: one file, drop into your system.', tag: 'workflow' },
-  { text: 'Balance sheet? We detect Account, Description, Debit/Credit (or Balance).', tag: 'format' },
+  { text: 'Upload a trial balance or balance sheet; we output Yardi-format journal entries (one row per line).', tag: 'feature' },
+  { text: 'Single file = one JE file. Multiple files (e.g. 12 months) = one combined workbook.', tag: 'feature' },
+  { text: 'Processed in your browser. Your file never leaves your device.', tag: 'privacy' },
+  { text: 'We auto-detect from column headers: Account, Debit, Credit (or Balance).', tag: 'format' },
+  { text: 'Post month = period (MM/YYYY). Journal date = date on each line. Property from filename or row 4.', tag: 'tips' },
+  { text: 'Coming next: GL name matching — map their chart of accounts to yours.', tag: 'soon' },
 ];
 
 export function NerdyHints() {

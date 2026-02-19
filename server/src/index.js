@@ -7,6 +7,7 @@ import { uploadRouter } from './routes/upload.js';
 import { exportRouter } from './routes/export.js';
 import { createFromPromptRouter } from './routes/createFromPrompt.js';
 import { feedbackRouter } from './routes/feedback.js';
+import { healthRouter } from './routes/health.js';
 import { stripeRouter } from './routes/stripe.js';
 import { adminRouter } from './routes/admin.js';
 
@@ -22,6 +23,7 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/create', createFromPromptRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/health', healthRouter);
 app.use('/api/stripe', stripeRouter);
 app.use('/api/admin', adminRouter);
 

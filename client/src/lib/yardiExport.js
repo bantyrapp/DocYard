@@ -1,8 +1,24 @@
 /**
  * Client-side Yardi trial balance / balance sheet → journal entry conversion.
  * Runs entirely in the browser so the app works offline.
+ * Uses xlsx-js-style for left alignment and styling in the Yardi export.
+ * Detection and parsing rules live in parsingRules.js (single source of truth).
  */
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
+import {
+  TRIAL_BALANCE,
+  BALANCE_SHEET,
+  SKIP_ROW,
+  PROPERTY_FROM_SHEET,
+  PROPERTY_IGNORE_PATTERNS,
+  PROPERTY_FROM_FILENAME,
+  FILENAME_MONTH,
+  PERIOD_IN_CELL,
+  MONTH_ROW,
+  NUMERIC,
+  YARDI_DEFAULTS,
+} from './parsingRules.js';
+import { getMergedTrialBalanceHeaders } from './feedbackLearner.js';
 
 const YARDI_JE_HEADERS = [
   'Tran_Seq_Number', 'JournalDate', 'PostMonth', 'Property_Name', 'Account',
@@ -15,55 +31,71 @@ function norm(s) {
 }
 
 function findTrialBalanceHeaderRow(rows) {
+  const merged = getMergedTrialBalanceHeaders(TRIAL_BALANCE);
+  const accountSet = new Set(merged.accountHeaders.map((h) => norm(h)));
+  const debitSet = new Set(merged.debitHeaders.map((h) => norm(h)));
+  const creditSet = new Set(merged.creditHeaders.map((h) => norm(h)));
   for (let i = 0; i < Math.min(rows.length, 20); i++) {
     const row = rows[i] || [];
     const cells = (Array.isArray(row) ? row : [row]).map((c) => norm(c));
-    const hasAccount = cells.some((c) => c === 'ACCOUNT' || c === 'GL' || c === 'ACCOUNT#');
-    const hasDebit = cells.some((c) => c === 'DEBIT' || c === 'DEBITS');
-    const hasCredit = cells.some((c) => c === 'CREDIT' || c === 'CREDITS');
+    const hasAccount = cells.some((c) => accountSet.has(c));
+    const hasDebit = cells.some((c) => debitSet.has(c));
+    const hasCredit = cells.some((c) => creditSet.has(c));
     if (hasAccount && (hasDebit || hasCredit)) return i;
   }
   return -1;
 }
 
-/** Detect balance sheet / alternate layout: Account (or GL/Code) + Debit/Credit or Balance. */
-function findBalanceSheetHeaderRow(rows) {
-  const accountLike = /ACCOUNT|GL|CODE|ACCOUNT#|ACCT/i;
-  const nameLike = /NAME|DESCRIPTION|DESC|ACCOUNTNAME/i;
-  const debitLike = /DEBIT|DEBITS/i;
-  const creditLike = /CREDIT|CREDITS/i;
-  const balanceLike = /BALANCE|ENDING|AMOUNT|CURRENT/i;
+/** Map header row to column indices for trial balance (account, name, debit, credit). */
+function getTrialBalanceColumnMap(headerRow) {
+  const merged = getMergedTrialBalanceHeaders(TRIAL_BALANCE);
+  const accountSet = new Set(merged.accountHeaders.map((h) => norm(h)));
+  const debitSet = new Set(merged.debitHeaders.map((h) => norm(h)));
+  const creditSet = new Set(merged.creditHeaders.map((h) => norm(h)));
+  const row = Array.isArray(headerRow) ? headerRow : [headerRow];
+  let colAccount = -1;
+  let colName = -1;
+  let colDebit = -1;
+  let colCredit = -1;
+  row.forEach((cell, idx) => {
+    const c = norm(cell);
+    if (accountSet.has(c) && colAccount < 0) colAccount = idx;
+    if (debitSet.has(c)) colDebit = idx;
+    if (creditSet.has(c)) colCredit = idx;
+  });
+  if (colAccount < 0) colAccount = 0;
+  if (colName < 0) colName = colAccount + 1 <= row.length - 1 ? colAccount + 1 : colAccount;
+  if (colDebit < 0) colDebit = TRIAL_BALANCE.defaultColDebit;
+  if (colCredit < 0) colCredit = TRIAL_BALANCE.defaultColCredit;
+  return { colAccount, colName, colDebit, colCredit };
+}
 
+function findBalanceSheetHeaderRow(rows) {
+  const { accountPattern, debitPattern, creditPattern, balancePattern } = BALANCE_SHEET;
   for (let i = 0; i < Math.min(rows.length, 25); i++) {
     const row = rows[i] || [];
     const cells = (Array.isArray(row) ? row : [row]).map((c) => String(c ?? '').trim());
-    const hasAccount = cells.some((c) => accountLike.test(c));
-    const hasDebit = cells.some((c) => debitLike.test(c));
-    const hasCredit = cells.some((c) => creditLike.test(c));
-    const hasBalance = cells.some((c) => balanceLike.test(c));
+    const hasAccount = cells.some((c) => accountPattern.test(c));
+    const hasDebit = cells.some((c) => debitPattern.test(c));
+    const hasCredit = cells.some((c) => creditPattern.test(c));
+    const hasBalance = cells.some((c) => balancePattern.test(c));
     if (hasAccount && (hasDebit || hasCredit || hasBalance)) return i;
   }
   return -1;
 }
 
-/** Return column indices for balance sheet: account, name, debit, credit, balance (optional). */
 function getBalanceSheetColumnMap(headerRow) {
   const row = Array.isArray(headerRow) ? headerRow : [headerRow];
   const map = { colAccount: -1, colName: -1, colDebit: -1, colCredit: -1, colBalance: -1 };
-
-  const accountLike = /ACCOUNT|GL|CODE|ACCOUNT#|ACCT/i;
-  const nameLike = /NAME|DESCRIPTION|DESC|ACCOUNTNAME/i;
-  const debitLike = /^DEBIT|DEBITS$/i;
-  const creditLike = /^CREDIT|CREDITS$/i;
-  const balanceLike = /CURRENT\s*BALANCE|BALANCE|ENDING|AMOUNT|CURRENT/i;
+  const { accountPattern, namePattern, debitHeaderPattern, creditHeaderPattern, balanceHeaderPattern } = BALANCE_SHEET;
 
   row.forEach((cell, idx) => {
     const s = String(cell ?? '').trim();
-    if (accountLike.test(s) && map.colAccount < 0) map.colAccount = idx;
-    if (nameLike.test(s) && map.colName < 0) map.colName = idx;
-    if (debitLike.test(s)) map.colDebit = idx;
-    if (creditLike.test(s)) map.colCredit = idx;
-    if (balanceLike.test(s) && map.colBalance < 0) map.colBalance = idx;
+    if (accountPattern.test(s) && map.colAccount < 0) map.colAccount = idx;
+    if (namePattern.test(s) && map.colName < 0) map.colName = idx;
+    if (debitHeaderPattern.test(s)) map.colDebit = idx;
+    if (creditHeaderPattern.test(s)) map.colCredit = idx;
+    if (balanceHeaderPattern.test(s) && map.colBalance < 0) map.colBalance = idx;
   });
 
   if (map.colAccount < 0) map.colAccount = 0;
@@ -73,13 +105,12 @@ function getBalanceSheetColumnMap(headerRow) {
 
 function parseMonthRow(monthStr) {
   const s = String(monthStr ?? '').trim();
-  const matchLong = s.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{4})\b/i);
-  const matchShort = s.match(/\b(\d{1,2})[/\-]\s*(\d{4})\b/);
+  const matchLong = s.match(MONTH_ROW.longPattern);
+  const matchShort = s.match(MONTH_ROW.shortPattern);
   let monthNum = 1;
   let year = new Date().getFullYear();
   if (matchLong) {
-    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-    monthNum = months.indexOf(matchLong[1].toLowerCase().slice(0, 3)) + 1;
+    monthNum = MONTH_ROW.monthNamesShort.indexOf(matchLong[1].toLowerCase().slice(0, 3)) + 1;
     year = parseInt(matchLong[2], 10);
   } else if (matchShort) {
     monthNum = parseInt(matchShort[1], 10);
@@ -99,16 +130,138 @@ export function ymdToMmDdYyyy(ymd) {
   return `${m}/${d}/${y}`;
 }
 
+/** Infer post month MM/YYYY from filename (see parsingRules.FILENAME_MONTH). */
+export function getPostMonthFromFilename(filename) {
+  const name = String(filename ?? '');
+  let match = name.match(FILENAME_MONTH.patternFullYear);
+  if (match) {
+    const month = Math.min(12, Math.max(1, parseInt(match[1], 10)));
+    const year = parseInt(match[2], 10);
+    if (!Number.isNaN(year)) return `${String(month).padStart(2, '0')}/${year}`;
+  }
+  match = name.match(FILENAME_MONTH.patternShortYear);
+  if (match) {
+    const month = Math.min(12, Math.max(1, parseInt(match[1], 10)));
+    const yy = parseInt(match[2], 10);
+    if (!Number.isNaN(yy)) {
+      const year = yy >= 0 && yy <= 99 ? FILENAME_MONTH.shortYearBase + yy : yy;
+      return `${String(month).padStart(2, '0')}/${year}`;
+    }
+  }
+  return null;
+}
+
+/** Extract property name from filename (see parsingRules.PROPERTY_FROM_FILENAME). */
+export function getPropertyNameFromFilename(filename) {
+  const name = String(filename ?? '').replace(/\.xlsx?$/i, '');
+  const parts = name.split(/[\s._-]+/).filter(Boolean);
+  const { excludeWords, validWordPattern, minLength } = PROPERTY_FROM_FILENAME;
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i];
+    if (validWordPattern.test(p) && p.length >= minLength && !excludeWords.has(p)) return p;
+  }
+  return null;
+}
+
+function parseNum(v) {
+  if (v === undefined || v === null || v === '') return 0;
+  if (typeof v === 'number' && !Number.isNaN(v)) return v;
+  const n = parseFloat(String(v).replace(NUMERIC.stripFromNumber, ''), 10);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+const LEFT_ALIGN = { alignment: { horizontal: 'left', vertical: 'center' } };
+
+/** Apply formats: col A = number (Tran_Seq), col H/I = number (Debit/Credit); rest = text; all cells left-aligned. */
+function applyYardiCellFormats(ws, rowCount, colCount = 12) {
+  const DEBIT_COL = 7;
+  const CREDIT_COL = 8;
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
+      const ref = XLSX.utils.encode_cell({ r, c });
+      const cell = ws[ref];
+      if (!cell) continue;
+      const raw = cell.v;
+      if (c === 0 && r > 0) {
+        const num = typeof raw === 'number' && !Number.isNaN(raw) ? raw : parseInt(String(raw).replace(/^'/, ''), 10);
+        cell.t = 'n';
+        cell.v = Number.isNaN(num) ? 1 : num;
+        delete cell.z;
+        cell.w = String(cell.v);
+        cell.s = LEFT_ALIGN;
+        continue;
+      }
+      if ((c === DEBIT_COL || c === CREDIT_COL) && r > 0) {
+        const num = parseNum(raw);
+        cell.t = 'n';
+        cell.v = num;
+        cell.z = '#,##0.00';
+        cell.w = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        cell.s = LEFT_ALIGN;
+        continue;
+      }
+      const asText = raw === undefined || raw === null ? '' : String(raw);
+      cell.t = 's';
+      cell.v = asText;
+      cell.z = '@';
+      cell.w = asText;
+      cell.s = LEFT_ALIGN;
+    }
+  }
+}
+
+/** Compute column widths from sheet content so nothing gets cut off (auto-fit). */
+function getAutoFitColWidths(ws, rowCount, colCount) {
+  const widths = Array(colCount).fill(8);
+  for (let r = 0; r < rowCount; r++) {
+    for (let c = 0; c < colCount; c++) {
+      const ref = XLSX.utils.encode_cell({ r, c });
+      const cell = ws[ref];
+      if (!cell) continue;
+      const len = (cell.w != null ? String(cell.w) : String(cell.v ?? '')).length;
+      widths[c] = Math.max(widths[c], Math.min(len + 1, 60));
+    }
+  }
+  return widths.map((wch) => ({ wch: Math.max(8, Math.min(60, wch)) }));
+}
+
+/** Build Excel blob from pre-built Yardi JE rows (header + data). Left-aligned, auto-fit columns. */
+export function buildExcelFromYardiRows(yardiRows) {
+  if (!yardiRows?.length) throw new Error('No rows');
+  const ws = XLSX.utils.aoa_to_sheet(yardiRows);
+  const rowCount = yardiRows.length;
+  const colCount = Math.max(...yardiRows.map((row) => (Array.isArray(row) ? row.length : 0)), 12);
+  applyYardiCellFormats(ws, rowCount, colCount);
+  ws['!cols'] = getAutoFitColWidths(ws, rowCount, colCount);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, YARDI_JE_SHEET_NAME);
+  const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+  return new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+/** Extract property name from sheet (row 4: "Properties: Fitz - ..."). */
+function extractPropertyNameFromRow4(rows) {
+  const row = rows && rows[PROPERTY_FROM_SHEET.rowIndex];
+  if (!row) return null;
+  const cell = String((Array.isArray(row) ? row[0] : row) ?? '').trim();
+  const match = cell.match(PROPERTY_FROM_SHEET.pattern);
+  return match ? match[1].trim() || null : null;
+}
+
+function looksLikeTimestampOrDate(str) {
+  return PROPERTY_IGNORE_PATTERNS.some((re) => re.test(String(str ?? '').trim()));
+}
+
 /** Extract period MM/YYYY from first rows (for pre-filling post month). */
 export function extractPeriod(rows) {
-  for (let i = 0; i < Math.min(rows.length, 10); i++) {
+  const { maxRowsToScan, monthNamePattern, monthNamesShort, shortPattern } = PERIOD_IN_CELL;
+  for (let i = 0; i < Math.min(rows.length, maxRowsToScan); i++) {
     const row = rows[i] || [];
     const cell = String((Array.isArray(row) ? row[0] : row) ?? '').trim();
-    const monthMatch = cell.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{4})\b/i);
-    const shortMatch = cell.match(/\b(\d{1,2})[\/\-]\s*(\d{4})\b/);
+    const monthMatch = cell.match(monthNamePattern);
+    const shortMatch = cell.match(shortPattern);
     if (monthMatch) {
-      const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-      const m = months.indexOf(monthMatch[1].toLowerCase().slice(0, 3)) + 1;
+      const m = monthNamesShort.indexOf(monthMatch[1].toLowerCase().slice(0, 3)) + 1;
       return `${String(m).padStart(2, '0')}/${monthMatch[2]}`;
     }
     if (shortMatch) return `${String(parseInt(shortMatch[1], 10)).padStart(2, '0')}/${shortMatch[2]}`;
@@ -119,18 +272,22 @@ export function extractPeriod(rows) {
 function buildYardiJeRowsFromTrialBalance(rows, options = {}) {
   const out = [YARDI_JE_HEADERS];
   const idx = findTrialBalanceHeaderRow(rows);
-  if (idx < 0) throw new Error('Could not find trial balance header (ACCOUNT, DEBIT, CREDIT).');
+  if (idx < 0) throw new Error('Could not find a trial balance header row. The sheet should have column headers like Account, Debit, and Credit.');
 
   const titleRows = rows.slice(0, idx);
   const tableRows = rows.slice(idx);
+  const headerRow = tableRows[0];
   const dataRows = tableRows.slice(1);
+  const colMap = getTrialBalanceColumnMap(headerRow);
 
-  const propertyName = String(titleRows?.[1]?.[0] ?? '').trim();
+  const fromSheet = String(titleRows?.[1]?.[0] ?? '').trim();
+  const propertyFromRow4 = extractPropertyNameFromRow4(rows);
+  const propertyName = (options.propertyName && String(options.propertyName).trim()) || propertyFromRow4 || (!looksLikeTimestampOrDate(fromSheet) && fromSheet) || '';
   const parsed = parseMonthRow(titleRows?.[2]?.[0]);
   const postMonth = options.postMonth && String(options.postMonth).trim() ? String(options.postMonth).trim() : parsed.postMonth;
   const journalDate = options.journalDate && String(options.journalDate).trim() ? String(options.journalDate).trim() : parsed.journalDate;
-  const book = 'Both';
-  const unit = '101';
+  const book = YARDI_DEFAULTS.book;
+  const unit = YARDI_DEFAULTS.unit;
 
   const pad12 = (arr) => {
     const a = [...arr];
@@ -139,35 +296,36 @@ function buildYardiJeRowsFromTrialBalance(rows, options = {}) {
   };
 
   const numVal = (s) => {
-    const n = parseFloat(String(s).replace(/[,$]/g, ''), 10);
+    const n = parseFloat(String(s).replace(NUMERIC.stripFromNumber, ''), 10);
     return isNaN(n) ? 0 : n;
   };
 
   dataRows.forEach((row) => {
-    const account = row[0] ?? '';
-    const name = String(row[1] ?? '').trim();
-    const debit = row[3] ?? '';
-    const credit = row[4] ?? '';
-    const isTotalRow = /TOTAL|SUBTOTAL/i.test(name) || /TOTAL|SUBTOTAL/i.test(String(account));
+    const account = row[colMap.colAccount] ?? '';
+    const name = String(row[colMap.colName] ?? '').trim();
+    const debit = row[colMap.colDebit] ?? '';
+    const credit = row[colMap.colCredit] ?? '';
+    const isTotalRow = SKIP_ROW.totalPattern.test(name) || SKIP_ROW.totalPattern.test(String(account));
     if (isTotalRow) return;
 
     const d = numVal(debit);
     const c = numVal(credit);
     if (d === 0 && c === 0) return;
 
-    const reference = name ? `${postMonth} ${name}` : postMonth;
+    const accountVal = String(account ?? '');
+    const displayVal = postMonth ? `${postMonth} - ${accountVal}` : accountVal;
 
     out.push(pad12([
-      '1',
+      1,
       journalDate,
       postMonth,
       propertyName,
-      String(account),
-      reference,
-      name,
+      displayVal,
+      displayVal,
+      displayVal,
       String(debit),
       String(credit),
-      name,
+      displayVal,
       book,
       unit,
     ]));
@@ -179,7 +337,7 @@ function buildYardiJeRowsFromTrialBalance(rows, options = {}) {
 function buildYardiJeRowsFromBalanceSheet(rows, options = {}) {
   const out = [YARDI_JE_HEADERS];
   const idx = findBalanceSheetHeaderRow(rows);
-  if (idx < 0) throw new Error('Could not find balance sheet header (ACCOUNT and CURRENT BALANCE or Debit/Credit).');
+  if (idx < 0) throw new Error('Could not find a balance sheet header row. The sheet should have Account and either Debit/Credit or a Balance column.');
 
   const titleRows = rows.slice(0, idx);
   const tableRows = rows.slice(idx);
@@ -187,12 +345,14 @@ function buildYardiJeRowsFromBalanceSheet(rows, options = {}) {
   const dataRows = tableRows.slice(1);
   const map = getBalanceSheetColumnMap(headerRow);
 
-  const propertyName = String(titleRows?.[1]?.[0] ?? titleRows?.[0]?.[0] ?? '').trim();
+  const fromSheet = String(titleRows?.[1]?.[0] ?? titleRows?.[0]?.[0] ?? '').trim();
+  const propertyFromRow4 = extractPropertyNameFromRow4(rows);
+  const propertyName = (options.propertyName && String(options.propertyName).trim()) || propertyFromRow4 || (!looksLikeTimestampOrDate(fromSheet) && fromSheet) || '';
   const parsed = parseMonthRow(titleRows?.[2]?.[0] ?? titleRows?.[1]?.[0] ?? '');
   const postMonth = options.postMonth && String(options.postMonth).trim() ? String(options.postMonth).trim() : parsed.postMonth;
   const journalDate = options.journalDate && String(options.journalDate).trim() ? String(options.journalDate).trim() : parsed.journalDate;
-  const book = 'Both';
-  const unit = '101';
+  const book = YARDI_DEFAULTS.book;
+  const unit = YARDI_DEFAULTS.unit;
 
   const pad12 = (arr) => {
     const a = [...arr];
@@ -202,7 +362,7 @@ function buildYardiJeRowsFromBalanceSheet(rows, options = {}) {
 
   const getCell = (row, col) => (row && col >= 0 ? String(row[col] ?? '').trim() : '');
   const num = (s) => {
-    const n = parseFloat(String(s).replace(/[,$]/g, ''), 10);
+    const n = parseFloat(String(s).replace(NUMERIC.stripFromNumber, ''), 10);
     return isNaN(n) ? 0 : n;
   };
 
@@ -227,24 +387,24 @@ function buildYardiJeRowsFromBalanceSheet(rows, options = {}) {
       return;
     }
 
-    const isTotalRow = /TOTAL|SUBTOTAL/i.test(name) || /TOTAL|SUBTOTAL/i.test(account);
+    const isTotalRow = SKIP_ROW.totalPattern.test(name) || SKIP_ROW.totalPattern.test(account);
     if (isTotalRow) return;
     if (!account && !name) return;
 
-    const reference = name ? `${postMonth} ${name}` : postMonth;
     const acc = account || '';
+    const displayVal = postMonth ? `${postMonth} - ${acc}` : acc;
 
     out.push(pad12([
-      '1',
+      1,
       journalDate,
       postMonth,
       propertyName,
-      acc,
-      reference,
-      name,
+      displayVal,
+      displayVal,
+      displayVal,
       debit,
       credit,
-      name,
+      displayVal,
       book,
       unit,
     ]));
@@ -258,6 +418,21 @@ export function detectDocumentType(rows) {
   if (findTrialBalanceHeaderRow(rows) >= 0) return 'trial_balance';
   if (findBalanceSheetHeaderRow(rows) >= 0) return 'balance_sheet';
   return null;
+}
+
+/** Return the detected header row (ACCOUNT, DEBIT, CREDIT etc.) for feedback learning, or undefined. */
+export function getDetectedHeaderRow(rows) {
+  const tbIdx = findTrialBalanceHeaderRow(rows);
+  if (tbIdx >= 0) {
+    const row = rows[tbIdx];
+    return Array.isArray(row) ? row : [row];
+  }
+  const bsIdx = findBalanceSheetHeaderRow(rows);
+  if (bsIdx >= 0) {
+    const row = rows[bsIdx];
+    return Array.isArray(row) ? row : [row];
+  }
+  return undefined;
 }
 
 /**
@@ -290,16 +465,20 @@ export function parseExcelFile(file) {
  * Get Yardi JE rows (2D array) for preview or export. Same options as buildYardiJeExcel.
  */
 export function getYardiJeRows(rows, options = {}) {
-  const { postMonth, journalDate, docType = 'auto' } = options;
+  const { postMonth, journalDate, docType = 'auto', propertyName } = options;
   const journalDateMmDdYyyy = journalDate ? ymdToMmDdYyyy(journalDate) : null;
-  const opts = { postMonth: postMonth || undefined, journalDate: journalDateMmDdYyyy || undefined };
+  const opts = {
+    postMonth: postMonth || undefined,
+    journalDate: journalDateMmDdYyyy || undefined,
+    propertyName: propertyName || undefined,
+  };
 
   const useTrialBalance = docType === 'trial_balance' || (docType === 'auto' && findTrialBalanceHeaderRow(rows) >= 0);
   const useBalanceSheet = docType === 'balance_sheet' || (docType === 'auto' && findBalanceSheetHeaderRow(rows) >= 0);
 
   if (useTrialBalance) return buildYardiJeRowsFromTrialBalance(rows, opts);
   if (useBalanceSheet) return buildYardiJeRowsFromBalanceSheet(rows, opts);
-  throw new Error('Could not detect trial balance or balance sheet layout. Need columns like Account, Debit/Credit (or Balance).');
+  throw new Error('Could not detect trial balance or balance sheet. The sheet needs column headers such as Account, Debit, Credit (or Balance).');
 }
 
 /**
@@ -308,11 +487,92 @@ export function getYardiJeRows(rows, options = {}) {
  */
 export function buildYardiJeExcel(rows, options = {}) {
   const exportRows = getYardiJeRows(rows, options);
-  const ws = XLSX.utils.aoa_to_sheet(exportRows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, YARDI_JE_SHEET_NAME);
-  const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-  return new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  return buildExcelFromYardiRows(exportRows);
+}
+
+/** Last day of month MM/YYYY as YYYY-MM-DD (for journalDate). */
+function lastDayYmd(postMonth) {
+  if (!postMonth || !/^\d{1,2}\/\d{4}$/.test(String(postMonth).trim())) return '';
+  const [mm, yyyy] = String(postMonth).trim().split('/').map((n) => parseInt(n, 10));
+  const d = new Date(yyyy, mm, 0);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Parse multiple trial balance files (e.g. one per month), combine into one Yardi JE workbook.
+ * Each file: post month inferred from filename (e.g. "1.2025 Fitz TB.xlsx" → 01/2025) or from sheet.
+ * Returns { blob, suggestedName, months }.
+ */
+export async function combineMultipleTrialBalances(files, options = {}) {
+  if (!files?.length) throw new Error('No files selected');
+  const docType = options.docType === 'trial_balance' || options.docType === 'balance_sheet' ? options.docType : 'auto';
+
+  const parsed = await Promise.all(
+    Array.from(files).map(async (file) => {
+      const { rows, detectedPeriod, detectedType } = await parseExcelFile(file);
+      const postMonthFromName = getPostMonthFromFilename(file.name);
+      const postMonth = postMonthFromName || (detectedPeriod ? String(detectedPeriod).trim() : null);
+      const propertyName = getPropertyNameFromFilename(file.name);
+      return { name: file.name, rows, postMonth, detectedType, propertyName };
+    })
+  );
+
+  const withMonth = parsed
+    .filter((p) => p.rows?.length)
+    .map((p) => {
+      const postMonth = p.postMonth || null;
+      const sortKey = postMonth ? (() => {
+        const [mm, yyyy] = postMonth.split('/').map(Number);
+        return yyyy * 12 + mm;
+      })() : 0;
+      return { ...p, postMonth, sortKey };
+    })
+    .sort((a, b) => a.sortKey - b.sortKey);
+
+  if (withMonth.length === 0) throw new Error('No valid data in the selected files. Each file should have a trial balance with a detectable month (e.g. in the filename).');
+
+  const combined = [YARDI_JE_HEADERS];
+  const propertyOverride = options.propertyNameOverride && String(options.propertyNameOverride).trim();
+
+  const maxCols = Math.max(...withMonth.flatMap((m) => (m.rows || []).map((r) => (Array.isArray(r) ? r.length : 1))), 1);
+  const padRow = (row) => {
+    const arr = Array.isArray(row) ? [...row] : [row];
+    while (arr.length < maxCols) arr.push('');
+    return arr.slice(0, maxCols);
+  };
+  const combinedParsedRows = [];
+  for (let i = 0; i < withMonth.length; i++) {
+    const { rows, postMonth } = withMonth[i];
+    if (i > 0) {
+      combinedParsedRows.push(padRow(['']));
+      combinedParsedRows.push(padRow([`——— ${postMonth || 'Month'} ———`]));
+    }
+    (rows || []).forEach((row) => combinedParsedRows.push(padRow(row)));
+  }
+
+  for (const { rows, postMonth, propertyName } of withMonth) {
+    if (!postMonth) continue;
+    const journalDateYmd = lastDayYmd(postMonth);
+    const yardiRows = getYardiJeRows(rows, {
+      postMonth,
+      journalDate: journalDateYmd || undefined,
+      docType,
+      propertyName: propertyOverride || propertyName || undefined,
+    });
+    const dataRows = yardiRows.slice(1);
+    const monthNum = parseInt(String(postMonth).split('/')[0], 10) || 1;
+    for (const row of dataRows) {
+      const arr = Array.isArray(row) ? [...row] : [row];
+      arr[0] = monthNum;
+      combined.push(arr);
+    }
+  }
+
+  const blob = buildExcelFromYardiRows(combined);
+  const firstMonth = withMonth[0]?.postMonth?.replace('/', '-') || 'year';
+  const lastMonth = withMonth[withMonth.length - 1]?.postMonth?.replace('/', '-') || '';
+  const suggestedName = `yardi_je_${firstMonth}_to_${lastMonth}.xlsx`.replace(/\/|\\/g, '-');
+  return { blob, suggestedName, months: withMonth.map((m) => m.postMonth), combinedRows: combined, combinedParsedRows };
 }
 
 /**
@@ -327,10 +587,42 @@ export function downloadBlob(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
+/** Escape a CSV cell (quotes and wrap in quotes if needed). */
+function escapeCsvCell(val) {
+  const s = String(val ?? '');
+  if (s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+/**
+ * Build CSV string from 2D rows (for Google Sheets import).
+ * Uses comma delimiter and RFC 4180-style quoting.
+ */
+export function buildCsvFromRows(rows) {
+  if (!rows?.length) return '';
+  return rows
+    .map((row) => {
+      const arr = Array.isArray(row) ? row : [row];
+      return arr.map(escapeCsvCell).join(',');
+    })
+    .join('\r\n');
+}
+
+/**
+ * Download rows as CSV (for Google Sheets: File → Import → Upload).
+ */
+export function downloadCsv(rows, filename = 'export.csv') {
+  const csv = buildCsvFromRows(rows);
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  downloadBlob(blob, filename);
+}
+
 /** Generate and download a blank Yardi JE template (headers + one sample row). */
 export function downloadYardiJeTemplate() {
   const headers = YARDI_JE_HEADERS;
-  const sampleRow = ['1', '01/31/2025', '01/2025', 'Property Name', '1000', '01/2025 Sample', 'Sample line', '100', '0', 'Sample', 'Both', '101'];
+  const sampleRow = [1, '01/31/2025', '01/2025', 'Property Name', '01/2025 - 1000', '01/2025 - 1000', '01/2025 - 1000', '100', '0', '01/2025 - 1000', YARDI_DEFAULTS.book, YARDI_DEFAULTS.unit];
   const rows = [headers, sampleRow];
   const ws = XLSX.utils.aoa_to_sheet(rows);
   const wb = XLSX.utils.book_new();

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { UploadZone } from '../components/UploadZone';
 import { NerdyHints } from '../components/NerdyHints';
+import { loadServerLearnedRules } from '../lib/feedbackLearner.js';
 import '../App.css';
 
 const OPEN_DOC_KEY = 'docyard_open_doc';
@@ -43,6 +44,10 @@ export function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    loadServerLearnedRules();
+  }, []);
+
   const onLoadDocument = useCallback((doc) => {
     if (doc?.postMonth) setExportPostMonth(doc.postMonth);
     if (doc?.journalDate) setExportJournalDate(doc.journalDate);
@@ -58,7 +63,7 @@ export function Home() {
 
   return (
     <div className="home-page home-page--input">
-      <p className="home-intro">Upload your file. We detect trial balance or balance sheet and return an import-ready journal entry. Processed locally in your browser—your data is not uploaded.</p>
+      <p className="home-intro">Turn trial balance or balance sheet Excel files into Yardi-ready journal entries. One file or a full year—same flow. Preview both the original and Yardi format, then export. Processed in your browser; your data never leaves your device.</p>
       <NerdyHints />
       <UploadZone
         postMonth={exportPostMonth}

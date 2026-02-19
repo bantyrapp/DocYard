@@ -105,3 +105,17 @@ export function formatDateTime(iso) {
   const d = new Date(iso);
   return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
 }
+
+/** Relative time for "what changed" clarity: "2 min ago", "Yesterday", "Jan 5, 2025" */
+export function formatRelativeTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const sec = Math.floor((now - d) / 1000);
+  if (sec < 60) return 'Just now';
+  if (sec < 3600) return `${Math.floor(sec / 60)} min ago`;
+  if (sec < 86400 && d.getDate() === now.getDate()) return 'Today';
+  if (sec < 172800 && d.getDate() === now.getDate() - 1) return 'Yesterday';
+  if (sec < 604800) return `${Math.floor(sec / 86400)} days ago`;
+  return formatDateTime(iso);
+}

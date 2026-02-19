@@ -15,7 +15,7 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>2. Description of Service</h2>
-          <p>DocYard provides a tool for property accounting: converting trial balance exports (Excel) into journal entry import files. The Service is intended for real estate and property accounting. DocYard is not affiliated with, endorsed by, or connected to any third-party property management or accounting software.</p>
+          <p>DocYard converts trial balance and balance sheet Excel files into Yardi-format journal entry imports—single month or full year. The Service is for real estate and property accounting. DocYard is not affiliated with, endorsed by, or connected to Yardi or any other property management software.</p>
         </section>
 
         <section className="terms-section">

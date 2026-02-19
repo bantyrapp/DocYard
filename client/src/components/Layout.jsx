@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom';
 import { HamburgerMenu } from './HamburgerMenu';
-import { WelcomeSlides } from './WelcomeSlides';
 import { Verification } from '../pages/Verification';
 import { Onboarding } from '../pages/Onboarding';
 import { useAuth } from '../context/AuthContext';
@@ -35,7 +34,6 @@ export function Layout() {
     }
   }, [location.pathname, signedIn, onboardingComplete, navigate]);
 
-  const showWelcome = location.pathname === '/' && !signedIn;
   const showVerification = location.pathname === '/signup';
   const showOnboarding = location.pathname === '/onboarding' && signedIn && !onboardingComplete;
 
@@ -43,32 +41,66 @@ export function Layout() {
     <Verification onVerify={onVerify} />
   ) : showOnboarding ? (
     <Onboarding user={user} onComplete={completeOnboarding} />
-  ) : showWelcome ? (
-    <WelcomeSlides onSignIn={signInDev} />
   ) : (
     <Outlet />
   );
 
   return (
     <div className="layout">
-      <header className="app-header">
-        <button
-          type="button"
-          className="hamburger-btn"
-          onClick={() => setMenuOpen(true)}
-          aria-label="Open menu"
-        >
-          <span className="hamburger-icon" aria-hidden />
-          <span className="hamburger-icon" aria-hidden />
-          <span className="hamburger-icon" aria-hidden />
-        </button>
-        <Link to="/" className="app-brand-link">
-          <div className="app-brand-row">
-            <img src="/icon.png" alt="" className="app-icon" width="40" height="40" />
-            <h1 className="app-logo">DocYard</h1>
+      <header className="app-bar">
+        <div className="app-bar-inner">
+          <Link to="/" className="app-bar-brand">
+            <img src="/icon.png" alt="" className="app-bar-icon" width="36" height="36" />
+            <span className="app-bar-logo">DocYard</span>
+            <span className="app-bar-tagline">Yardi Real Estate Pal</span>
+          </Link>
+          <nav className="app-bar-nav" aria-label="Main">
+            <Link to="/" className="app-bar-link">Home</Link>
+            <Link to="/documents" className="app-bar-link">Documents</Link>
+            <Link to="/download" className="app-bar-link">Download</Link>
+            <Link to="/pricing" className="app-bar-link">Pricing</Link>
+            <Link to="/terms" className="app-bar-link">Terms</Link>
+            <Link to="/privacy" className="app-bar-link">Privacy</Link>
+          </nav>
+          <div className="app-bar-actions">
+            <div className="app-bar-theme" title="Theme">
+              <button
+                type="button"
+                className={`app-bar-theme-btn ${theme === 'light' ? 'active' : ''}`}
+                onClick={() => setTheme('light')}
+                aria-label="Light theme"
+              >
+                Light
+              </button>
+              <button
+                type="button"
+                className={`app-bar-theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                onClick={() => setTheme('dark')}
+                aria-label="Dark theme"
+              >
+                Dark
+              </button>
+            </div>
+            {signedIn ? (
+              <button type="button" className="app-bar-btn" onClick={signOut}>Sign out</button>
+            ) : (
+              <>
+                <button type="button" className="app-bar-btn" onClick={signInDev}>Sign in</button>
+                <Link to="/signup" className="app-bar-btn app-bar-btn--primary">Create account</Link>
+              </>
+            )}
           </div>
-          <p className="app-value">Secure property accounting. Trial balance to journal entry—processed in your browser. Not affiliated with any third-party software.</p>
-        </Link>
+          <button
+            type="button"
+            className="app-bar-menu-btn"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <span className="hamburger-icon" aria-hidden />
+            <span className="hamburger-icon" aria-hidden />
+            <span className="hamburger-icon" aria-hidden />
+          </button>
+        </div>
       </header>
 
       <HamburgerMenu
@@ -86,30 +118,35 @@ export function Layout() {
       </main>
 
       <footer className="app-footer">
-        <div className="footer-line" />
-        <p className="footer-trust">
-          <span className="footer-trust-icon" aria-hidden>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </span>
-          Your file is processed in your browser and is not uploaded to our servers.
-        </p>
-        <div className="footer-links">
-          <Link to="/">Home</Link>
-          <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/terms">Terms</Link>
-          <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/privacy">Privacy</Link>
-          <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/pricing">Pricing</Link>
-          <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/documents">Documents</Link>
-          <span className="footer-dot" aria-hidden>·</span>
-          <Link to="/download">Download</Link>
-        </div>
-        <div className="footer-bottom">
-          <span className="footer-logo">DocYard</span>
-          <span className="footer-copy"> · Secure property accounting</span>
-          <span className="footer-year"> · © {new Date().getFullYear()}</span>
+        <div className="app-footer-inner">
+          <div className="footer-line" />
+          <p className="footer-trust">
+            <span className="footer-trust-icon" aria-hidden>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            Processed in your browser · your file never leaves your device.
+          </p>
+          <p className="footer-coming-next">
+            <strong>Coming next:</strong> GL name matching — drop their trial balance, match to your chart of accounts, get Yardi import with your account numbers.
+          </p>
+          <div className="footer-links">
+            <Link to="/">Home</Link>
+            <span className="footer-dot" aria-hidden>·</span>
+            <Link to="/terms">Terms</Link>
+            <span className="footer-dot" aria-hidden>·</span>
+            <Link to="/privacy">Privacy</Link>
+            <span className="footer-dot" aria-hidden>·</span>
+            <Link to="/pricing">Pricing</Link>
+            <span className="footer-dot" aria-hidden>·</span>
+            <Link to="/documents">Documents</Link>
+            <span className="footer-dot" aria-hidden>·</span>
+            <Link to="/download">Download</Link>
+          </div>
+          <div className="footer-bottom">
+            <span className="footer-logo">DocYard</span>
+            <span className="footer-copy"> · Trial balance & balance sheet → Yardi journal entries</span>
+            <span className="footer-year"> · © {new Date().getFullYear()}</span>
+          </div>
         </div>
       </footer>
     </div>

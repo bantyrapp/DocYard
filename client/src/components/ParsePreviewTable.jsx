@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { getYardiJeRows, buildYardiJeExcel, downloadBlob } from '../lib/yardiExport';
+import { getYardiJeRows, buildYardiJeExcel, buildExcelFromYardiRows, downloadBlob, downloadCsv } from '../lib/yardiExport';
 import { ymdToMmDdYyyy } from '../lib/yardiExport';
-import { ParsePreviewFeedback } from './ParsePreviewFeedback.jsx';
 import { saveDocument } from '../lib/documents.js';
 
 /** "01/2025" → last day as YYYY-MM-DD */
@@ -19,8 +18,13 @@ export function ParsePreviewTable({
   postMonth,
   journalDate,
   detectedType,
+  propertyName,
+  combinedYardiRows,
+  combinedParsedRows,
+  suggestedMultiFilename,
 }) {
-  const [view, setView] = useState('parsed'); // 'parsed' | 'yardi'
+  const isMultiMode = !!(combinedYardiRows?.length);
+  const [view, setView] = useState(isMultiMode ? 'parsed' : 'parsed'); // 'parsed' = original/combined, 'yardi' = Yardi template
   const [editing, setEditing] = useState(null); // { r, c } or null
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveLabel, setSaveLabel] = useState('');
@@ -31,25 +35,37 @@ export function ParsePreviewTable({
   const journalDateMmDdYyyy = journalDateYmd ? ymdToMmDdYyyy(journalDateYmd) : '';
 
   const yardiRows = useMemo(() => {
+    if (isMultiMode && combinedYardiRows?.length) return combinedYardiRows;
     if (!parsedRows?.length) return [];
     try {
       return getYardiJeRows(parsedRows, {
         postMonth: postMonth || undefined,
         journalDate: journalDateYmd || undefined,
         docType: docType === 'auto' ? 'auto' : docType,
+        propertyName: propertyName || undefined,
       });
     } catch {
       return [];
     }
-  }, [parsedRows, postMonth, journalDateYmd, docType]);
+  }, [isMultiMode, combinedYardiRows, parsedRows, postMonth, journalDateYmd, docType, propertyName]);
 
   const handleExport = () => {
+    if (isMultiMode && combinedYardiRows?.length) {
+      try {
+        const blob = buildExcelFromYardiRows(combinedYardiRows);
+        downloadBlob(blob, suggestedMultiFilename || 'yardi_je_combined.xlsx');
+      } catch (e) {
+        console.error(e);
+      }
+      return;
+    }
     if (!parsedRows?.length) return;
     try {
       const blob = buildYardiJeExcel(parsedRows, {
         postMonth: postMonth || undefined,
         journalDate: journalDateYmd || undefined,
         docType: docType === 'auto' ? 'auto' : docType,
+        propertyName: propertyName || undefined,
       });
       downloadBlob(blob, 'yardi_je_import.xlsx');
     } catch (e) {
@@ -57,18 +73,38 @@ export function ParsePreviewTable({
     }
   };
 
-  const addRow = () => {
+  const handleExportCsv = () => {
+    if (isMultiMode && combinedYardiRows?.length) {
+      downloadCsv(combinedYardiRows, (suggestedMultiFilename || 'yardi_je_combined').replace(/\.xlsx?$/i, '.csv'));
+      return;
+    }
     if (!parsedRows?.length) return;
+    try {
+      const rows = getYardiJeRows(parsedRows, {
+        postMonth: postMonth || undefined,
+        journalDate: journalDateYmd || undefined,
+        docType: docType === 'auto' ? 'auto' : docType,
+        propertyName: propertyName || undefined,
+      });
+      downloadCsv(rows, 'yardi_je_import.csv');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const addRow = () => {
+    if (isMultiMode || !parsedRows?.length) return;
     const colCount = Math.max(...parsedRows.map((r) => (Array.isArray(r) ? r.length : 0)), 1);
     setParsedRows([...parsedRows, Array(colCount).fill('')]);
   };
 
   const addColumn = () => {
-    if (!parsedRows?.length) return;
+    if (isMultiMode || !parsedRows?.length) return;
     setParsedRows(parsedRows.map((row) => [...(Array.isArray(row) ? row : [row]), '']));
   };
 
   const setCell = (r, c, value) => {
+    if (isMultiMode || !parsedRows?.length) return;
     const next = parsedRows.map((row, i) => {
       const arr = Array.isArray(row) ? [...row] : [row];
       if (i === r) {
@@ -80,19 +116,23 @@ export function ParsePreviewTable({
     setParsedRows(next);
   };
 
-  const rows = view === 'parsed' ? parsedRows : yardiRows;
+  const rows = view === 'parsed'
+    ? (isMultiMode ? (combinedParsedRows || []) : (parsedRows || []))
+    : (yardiRows || []);
   const isParsed = view === 'parsed';
   const maxCols = rows.length ? Math.max(...rows.map((r) => (Array.isArray(r) ? r.length : 0)), 1) : 0;
-  const getCell = (row, c) => (Array.isArray(row) ? row[c] : c === 0 ? row : '');
+  const getCell = (row, c) => (row != null && Array.isArray(row) ? row[c] : c === 0 ? row : '');
 
   const defaultSaveLabel = postMonth ? `Trial balance ${postMonth}` : 'Saved document';
   const openSaveModal = () => {
+    if (isMultiMode) return;
     setSaveLabel(defaultSaveLabel);
     setSaveType('both');
     setSaveSuccess(false);
     setShowSaveModal(true);
   };
   const handleSaveToDocuments = () => {
+    if (isMultiMode || !parsedRows?.length) return;
     saveDocument({
       label: saveLabel.trim() || defaultSaveLabel,
       type: saveType,
@@ -108,7 +148,6 @@ export function ParsePreviewTable({
 
   return (
     <div className="parse-preview">
-      <ParsePreviewFeedback docType={docType} detectedType={detectedType} />
       <div className="parse-preview-header">
         <div className="parse-preview-tabs">
           <button
@@ -116,23 +155,27 @@ export function ParsePreviewTable({
             className={`parse-tab ${view === 'parsed' ? 'active' : ''}`}
             onClick={() => setView('parsed')}
           >
-            Parsed view
+            {isMultiMode ? 'Combined view' : 'Parsed view'}
           </button>
           <button
             type="button"
             className={`parse-tab ${view === 'yardi' ? 'active' : ''}`}
             onClick={() => setView('yardi')}
           >
-            Yardi view
+            Yardi template
           </button>
         </div>
         <p className="parse-preview-hint">
-          {view === 'parsed'
-            ? 'Your file as we read it. Edit cells, add rows or columns, then switch to Yardi view to see the export format.'
-            : 'This is what the downloaded file will look like. Export when ready.'}
+          {isMultiMode
+            ? (view === 'parsed'
+              ? 'Original trial balance data from each file, stacked by month (title rows and headers included). Scroll to see all rows.'
+              : 'Yardi import format: one row per journal entry line. Ready for Yardi import. Export when ready.')
+            : (view === 'parsed'
+              ? 'Your file as we read it, including title rows and column headers. Edit cells if needed; switch to Yardi template to export.'
+              : 'Yardi import format: one row per journal entry line. Export to Excel or CSV when ready.')}
         </p>
         <div className="parse-preview-actions">
-          {isParsed && (
+          {isParsed && !isMultiMode && (
             <>
               <button type="button" className="btn btn-ghost btn-sm" onClick={addRow}>
                 + Row
@@ -145,11 +188,16 @@ export function ParsePreviewTable({
           <button type="button" className="btn btn-primary" onClick={handleExport}>
             Export to Excel
           </button>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={openSaveModal} title="Save to Documents">
-            Save to Documents
+          <button type="button" className="btn btn-ghost btn-sm" onClick={handleExportCsv} title="Import into Google Sheets via File → Import">
+            Download CSV (Google Sheets)
           </button>
+          {!isMultiMode && (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={openSaveModal} title="Save to Documents">
+              Save to Documents
+            </button>
+          )}
         </div>
-        <p className="parse-preview-scroll-hint">Scroll left and right to see all columns.</p>
+        <p className="parse-preview-scroll-hint">Scroll horizontally for all columns; scroll down in the table for all rows.</p>
       </div>
 
       {showSaveModal && (
@@ -170,21 +218,21 @@ export function ParsePreviewTable({
                   className="save-doc-input"
                   value={saveLabel}
                   onChange={(e) => setSaveLabel(e.target.value)}
-                  placeholder="e.g. Trial balance 01/2025"
+                  placeholder="e.g. Fitz trial balance 01/2025"
                 />
                 <span className="save-doc-label save-doc-sublabel">Save as</span>
                 <div className="save-doc-type-options">
                   <label className="save-doc-radio">
                     <input type="radio" name="saveType" value="yardi" checked={saveType === 'yardi'} onChange={() => setSaveType('yardi')} />
-                    <span>Yardi export only</span>
+                    <span>Yardi journal entry file only (Excel for Yardi import)</span>
                   </label>
                   <label className="save-doc-radio">
                     <input type="radio" name="saveType" value="parsed" checked={saveType === 'parsed'} onChange={() => setSaveType('parsed')} />
-                    <span>Parsed view only</span>
+                    <span>Parsed data only (your file as we read it)</span>
                   </label>
                   <label className="save-doc-radio">
                     <input type="radio" name="saveType" value="both" checked={saveType === 'both'} onChange={() => setSaveType('both')} />
-                    <span>Both</span>
+                    <span>Both (parsed data + Yardi export)</span>
                   </label>
                 </div>
                 <div className="save-doc-modal-actions">
@@ -201,12 +249,12 @@ export function ParsePreviewTable({
           <thead>
             <tr>
               {Array.from({ length: maxCols }, (_, c) => (
-                <th key={c}>{String(getCell(rows[0], c) ?? '')}</th>
+                <th key={c}>{rows[0] != null ? String(getCell(rows[0], c) ?? '') : ''}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.slice(1).map((row, r) => (
+            {(rows.length ? rows.slice(1) : []).map((row, r) => (
               <tr key={r}>
                 {Array.from({ length: maxCols }, (_, c) => (
                   <td key={c}>

@@ -1,11 +1,27 @@
 .feedback-section {
-  margin-top: 2.5rem;
+  margin-top: 0;
+}
+
+.feedback-card-wrap {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-section--card .feedback-line {
+  display: none;
+}
+
+.feedback-section--card .feedback-heading {
+  margin-top: 0;
 }
 
 .feedback-line {
   height: 1px;
   background: var(--border);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .feedback-heading {
@@ -29,18 +45,33 @@
   max-width: 320px;
 }
 
-.feedback-vote {
+.feedback-rating-row {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.feedback-btn {
-  width: 48px;
-  height: 48px;
+.feedback-rating-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--textMuted);
+}
+
+.feedback-scale {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.feedback-scale-btn {
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--surface2);
-  font-size: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,19 +79,47 @@
   transition: border-color var(--transition), background var(--transition);
 }
 
-.feedback-btn:hover {
+.feedback-scale-btn:hover {
   border-color: var(--border-light);
   background: var(--surface3);
 }
 
-.feedback-btn.up.active {
+.feedback-scale-btn.low.active {
+  border-color: var(--error);
+  background: var(--errorMuted);
+}
+
+.feedback-scale-btn.mid.active {
+  border-color: var(--accent);
+  background: var(--accentMuted);
+}
+
+.feedback-scale-btn.high.active {
   border-color: var(--success);
   background: var(--successMuted);
 }
 
-.feedback-btn.down.active {
-  border-color: var(--error);
-  background: var(--errorMuted);
+.feedback-scale-desc {
+  font-size: 0.8125rem;
+  color: var(--textMuted);
+  margin: 0;
+}
+
+.feedback-select {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.feedback-select:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .feedback-message-label {

@@ -10,7 +10,7 @@ export function Privacy() {
 
         <section className="terms-section">
           <h2>1. Who we are</h2>
-          <p>DocYard (“we,” “our”) provides property accounting tools, including conversion of trial balance and balance sheet data to journal entry format. This policy describes how we handle your information.</p>
+          <p>DocYard (“we,” “our”) provides trial balance and balance sheet to Yardi journal entry conversion (single file or multi-month). This policy describes how we handle your information.</p>
         </section>
 
         <section className="terms-section">

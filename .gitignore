@@ -13,6 +13,7 @@ client/.env
 dist/
 build/
 client/dist/
+release/
 
 # Logs and debug
 logs/

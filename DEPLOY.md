@@ -69,6 +69,68 @@ Auth and user tables live in Supabase; you can link them to Railway Postgres lat
 
 ---
 
+## API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/health | Health check (Railway/load balancers). Returns `{ ok, service, timestamp }`. |
+| POST | /api/feedback | Submit feedback. Body: `{ type: 'good'\|'bad', message?, context?, tags? }`. Returns 201 `{ success: true }`. |
+| GET | /api/feedback/stats | Aggregate counts. Returns `{ success: true, data: { total, good, bad, recent } }`. |
+| POST | /api/export/excel | Export rows to Excel (Yardi JE or standard). |
+| POST | /api/export/csv | Export rows to CSV. |
+
+Errors use `{ success: false, error: "message" }` with appropriate status code. For Postgres/Railway migration, see `server/docs/SCHEMA.md`.
+
+---
+
+## Desktop app (Electron)
+
+You can build DocYard as a desktop app (Windows, Mac, or Linux). The desktop build runs the **client only** (no server): parsing, documents, and exports work offline; feedback is stored locally when the server is not available.
+
+### Prerequisites
+
+From the project root, install dependencies including Electron:
+
+```bash
+npm install
+cd client && npm install && cd ..
+```
+
+### Run desktop app in development
+
+1. Start the Vite dev server and Electron (Electron will open and load http://localhost:3000):
+
+```bash
+npm run electron:dev
+```
+
+2. Or in two terminals: `npm run dev:client` then `npx electron .`
+
+### Build installable desktop app
+
+1. Build the client and package with Electron Builder:
+
+```bash
+npm run electron:build
+```
+
+2. Output is in the **`release/`** folder:
+   - **Windows:** `release/DocYard Setup x.x.x.exe` (installer) and `release/DocYard x.x.x.exe` (portable)
+   - **macOS:** `release/DocYard-x.x.x.dmg`
+   - **Linux:** `release/DocYard-x.x.x.AppImage`
+
+3. To build without creating the installer (faster, for testing): `npm run electron:pack`
+
+4. To build for a specific architecture (e.g. 64-bit Windows on an ARM machine):  
+   `npm run build && electron-builder --win --x64`
+
+### Notes
+
+- The desktop app does not start the Node server; it uses only the built client. API features (e.g. feedback to server) work when you later point the app at a deployed backend, or they fall back to local storage.
+- Windows Defender or SmartScreen may show a warning for unsigned builds; you can “Run anyway” or sign the app with a code-signing certificate for distribution.
+
+---
+
 ## Run locally
 
 ```bash
