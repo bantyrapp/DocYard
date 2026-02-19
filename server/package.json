@@ -2,7 +2,7 @@
   "name": "doc-parser-server",
   "version": "1.0.0",
   "license": "UNLICENSED",
-  "author": "DocYard",
+  "author": "EazyBooks",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",

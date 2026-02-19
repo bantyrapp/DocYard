@@ -10,12 +10,12 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>1. Agreement</h2>
-          <p>By using DocYard (“Service”), you agree to these Terms of Service. If you do not agree, do not use the Service.</p>
+          <p>By using EazyBooks (“Service”), you agree to these Terms of Service. If you do not agree, do not use the Service.</p>
         </section>
 
         <section className="terms-section">
           <h2>2. Description of Service</h2>
-          <p>DocYard converts trial balance and balance sheet Excel files into Yardi-format journal entry imports—single month or full year. The Service is for real estate and property accounting. DocYard is not affiliated with, endorsed by, or connected to Yardi or any other property management software.</p>
+          <p>EazyBooks converts trial balance and balance sheet Excel files into Yardi-format journal entry imports—single month or full year. The Service is for real estate and property accounting. EazyBooks is not affiliated with, endorsed by, or connected to Yardi or any other property management software.</p>
         </section>
 
         <section className="terms-section">
@@ -40,7 +40,7 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>7. Limitation of Liability</h2>
-          <p>To the fullest extent permitted by law, DocYard and its providers shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
+          <p>To the fullest extent permitted by law, EazyBooks and its providers shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
         </section>
 
         <section className="terms-section">
@@ -55,11 +55,11 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>10. Contact</h2>
-          <p>Questions about these Terms may be sent to the contact address provided on the DocYard website.</p>
+          <p>Questions about these Terms may be sent to the contact address provided on the EazyBooks website.</p>
         </section>
 
         <p className="terms-back">
-          <Link to="/">← Back to DocYard</Link>
+          <Link to="/">← Back to EazyBooks</Link>
         </p>
       </div>
     </div>

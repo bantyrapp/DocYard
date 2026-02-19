@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', (req, res) => {
   res.json({
     ok: true,
-    service: 'docyard',
+    service: 'eazybookz',
     timestamp: new Date().toISOString(),
   });
 });

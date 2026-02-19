@@ -21,7 +21,7 @@ export function Download() {
       <div className="page-inner download-inner">
         <h1 className="page-title download-page-title">
           <span className="download-page-title-icon" aria-hidden><DownloadIcon size={28} /></span>
-          Download DocYard
+          Download EazyBooks
         </h1>
         <p className="download-intro">
           Trial balance & balance sheet → Yardi journal entries. One file or full year. Free desktop app — works offline.
@@ -77,16 +77,16 @@ export function Download() {
             With Node.js: clone the repo, run <code>npm install</code> then <code>npm run electron:build</code>. Output is in <code>release/</code>.
           </p>
           <p className="download-build-note">
-            Windows: <code>release\DocYard Setup *.exe</code>. Mac: <code>release/*.dmg</code>. Linux: <code>release/*.AppImage</code>.
+            Windows: <code>release\EazyBooks Setup *.exe</code>. Mac: <code>release/*.dmg</code>. Linux: <code>release/*.AppImage</code>.
           </p>
         </div>
 
         <p className="download-note">
-          Or use DocYard in your browser — no download or sign-in required.
+          Or use EazyBooks in your browser — no download or sign-in required.
         </p>
 
         <p className="download-back">
-          <Link to="/">← Back to DocYard</Link>
+          <Link to="/">← Back to EazyBooks</Link>
         </p>
       </div>
     </div>

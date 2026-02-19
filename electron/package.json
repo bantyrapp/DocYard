@@ -1,9 +1,9 @@
 {
-  "name": "docyard-app",
+  "name": "eazybookz-app",
   "version": "1.0.0",
-  "description": "DocYard desktop app",
+  "description": "EazyBookz desktop app",
   "main": "main.js",
-  "author": "DocYard",
+  "author": "EazyBookz",
   "license": "UNLICENSED",
   "scripts": {
     "start": "electron .",
@@ -17,8 +17,8 @@
     "electron-builder": "^24.9.1"
   },
   "build": {
-    "appId": "com.docyard.app",
-    "productName": "DocYard",
+    "appId": "com.eazybookz.app",
+    "productName": "EazyBookz",
     "directories": {
       "output": "dist"
     },

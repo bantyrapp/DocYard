@@ -1,8 +1,8 @@
 {
-  "name": "docyard",
+  "name": "eazybookz",
   "private": true,
   "version": "1.0.0",
-  "description": "DocYard – property accounting, trial balance to Yardi JE",
+  "description": "EazyBookz – trial balance to Yardi journal entries",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
@@ -23,8 +23,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.docyard.app",
-    "productName": "DocYard",
+    "appId": "com.eazybookz.app",
+    "productName": "EazyBookz",
     "directories": { "output": "release" },
     "files": ["electron/**", "client/dist/**", "client/public/icon.png"],
     "win": {

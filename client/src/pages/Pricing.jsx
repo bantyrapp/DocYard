@@ -31,7 +31,7 @@ export function Pricing() {
 
         <div className="pricing-card-single">
           <div className="pricing-card-line" />
-          <p className="pricing-plan-name">DocYard</p>
+          <p className="pricing-plan-name">EazyBooks</p>
           <p className="pricing-price">
             <span className="pricing-amount">$10</span>
             <span className="pricing-period">/month</span>

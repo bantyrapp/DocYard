@@ -51,8 +51,8 @@ export function Layout() {
         <div className="app-bar-inner">
           <Link to="/" className="app-bar-brand">
             <img src="/icon.png" alt="" className="app-bar-icon" width="36" height="36" />
-            <span className="app-bar-logo">DocYard</span>
-            <span className="app-bar-tagline">Yardi Real Estate Pal</span>
+            <span className="app-bar-logo">EazyBookz</span>
+            <span className="app-bar-tagline">Trial balance to Yardi, easy</span>
           </Link>
           <nav className="app-bar-nav" aria-label="Main">
             <Link to="/" className="app-bar-link">Home</Link>
@@ -143,7 +143,7 @@ export function Layout() {
             <Link to="/download">Download</Link>
           </div>
           <div className="footer-bottom">
-            <span className="footer-logo">DocYard</span>
+            <span className="footer-logo">EazyBookz</span>
             <span className="footer-copy"> · Trial balance & balance sheet → Yardi journal entries</span>
             <span className="footer-year"> · © {new Date().getFullYear()}</span>
           </div>

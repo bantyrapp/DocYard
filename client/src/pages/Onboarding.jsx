@@ -5,7 +5,7 @@ const ONBOARDING_STEPS = [
   { id: 'info', title: 'Your information', subtitle: 'Confirm your details' },
   { id: 'preferences', title: 'Preferences', subtitle: 'How you like to work' },
   { id: 'paywall', title: 'Choose your plan', subtitle: 'Start free, upgrade when you need more' },
-  { id: 'completed', title: "You're all set", subtitle: 'Start using DocYard' },
+  { id: 'completed', title: "You're all set", subtitle: 'Start using EazyBooks' },
 ];
 
 export function Onboarding({ user, onComplete }) {

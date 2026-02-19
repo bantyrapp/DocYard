@@ -1,13 +1,13 @@
-# Deploy DocYard to Railway
+# Deploy EazyBookz to Railway
 
-Use this guide to connect your GitHub repo to Railway (project name: **DocYard**) and fix "Failed to get network endpoint." The endpoint appears after a **successful** deploy and when the service is healthy.
+Use this guide to connect your GitHub repo to Railway and deploy **EazyBookz** (eazybookz.com). The endpoint appears after a **successful** deploy and when the service is healthy.
 
 ---
 
 ## 1. Connect the repo
 
-1. In **Railway** → your **DocYard** project → **New** → **GitHub Repo**.
-2. Select the repo that contains this code (e.g. `bantui/AP/docYard` or your org/repo).
+1. In **Railway** → your project → **New** → **GitHub Repo**.
+2. Select the repo that contains this code.
 3. Railway will create a **service** and use the config in this repo (`railway.json`).
 
 **If the service already exists and the source is wrong:**
@@ -18,7 +18,7 @@ Use this guide to connect your GitHub repo to Railway (project name: **DocYard**
 
 ## 2. Variables (Railway dashboard)
 
-In the DocYard service → **Variables** tab, add:
+In the service → **Variables** tab, add:
 
 | Variable        | Value        | Notes                                      |
 |----------------|--------------|--------------------------------------------|
@@ -62,8 +62,8 @@ This usually means one of:
    - The app already uses `process.env.PORT` in `server/src/index.js`. No change needed if you’re using the repo’s start command.
 
 3. **Public networking not enabled**  
-   - In the DocYard service → **Settings** → **Networking** → enable **Public Networking** (or add a **Generate Domain** button if you see it).  
-   - After a successful deploy, Railway will show a URL (e.g. `https://docYard-production-xxxx.up.railway.app`).
+   - In the service → **Settings** → **Networking** → enable **Public Networking** (or add a **Generate Domain** button if you see it).  
+   - After a successful deploy, Railway will show a URL. Point your domain **eazybookz.com** to this URL (CNAME or A record as Railway instructs).
 
 4. **Healthcheck failing**  
    - We use `healthcheckPath: "/api/health"`. If the app crashes or doesn’t respond on that path, the deploy can stay unhealthy. Check **Deployments** → latest deploy → **View logs** for errors.
@@ -86,7 +86,7 @@ This usually means one of:
    - **Project URL** → use as `VITE_SUPABASE_URL` and `SUPABASE_URL`.
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`.
    - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (server only; never in client).
-3. In Railway → DocYard service → **Variables** → add the variables from the table in section 2.
+3. In Railway → your service → **Variables** → add the variables from the table in section 2.
 4. Redeploy so the client build picks up `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 
 The app already reads these in `client/src/lib/supabase.js` and in the server where needed.

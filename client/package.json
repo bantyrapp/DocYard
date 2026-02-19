@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "license": "UNLICENSED",
-  "author": "DocYard",
+  "author": "EazyBooks",
   "type": "module",
   "scripts": {
     "dev": "vite",

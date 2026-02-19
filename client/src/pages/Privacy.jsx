@@ -10,7 +10,7 @@ export function Privacy() {
 
         <section className="terms-section">
           <h2>1. Who we are</h2>
-          <p>DocYard (“we,” “our”) provides trial balance and balance sheet to Yardi journal entry conversion (single file or multi-month). This policy describes how we handle your information.</p>
+          <p>EazyBooks (“we,” “our”) provides trial balance and balance sheet to Yardi journal entry conversion (single file or multi-month). This policy describes how we handle your information.</p>
         </section>
 
         <section className="terms-section">
@@ -35,11 +35,11 @@ export function Privacy() {
 
         <section className="terms-section">
           <h2>6. Contact</h2>
-          <p>For privacy questions or requests, use the contact information provided on the DocYard website.</p>
+          <p>For privacy questions or requests, use the contact information provided on the EazyBooks website.</p>
         </section>
 
         <p className="terms-back">
-          <Link to="/">← Back to DocYard</Link>
+          <Link to="/">← Back to EazyBooks</Link>
         </p>
       </div>
     </div>

@@ -73,7 +73,7 @@ export function Admin() {
         )}
 
         <p className="admin-back">
-          <Link to="/">← Back to DocYard</Link>
+          <Link to="/">← Back to EazyBooks</Link>
         </p>
       </div>
     </div>
