@@ -58,6 +58,44 @@
   max-width: 100%;
 }
 
+.home-beta-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 0 0 1rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--accentMuted);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-lg);
+}
+
+.home-beta-badge {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  line-height: 1.2;
+  margin-top: 0.1rem;
+}
+
+.home-beta-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--textMuted);
+}
+
+.home-page--input .home-beta-banner {
+  margin-bottom: 0.85rem;
+}
+
 .home-intro {
   font-size: 0.9375rem;
   color: var(--textMuted);

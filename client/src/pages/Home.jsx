@@ -63,6 +63,13 @@ export function Home() {
 
   return (
     <div className="home-page home-page--input">
+      <div className="home-beta-banner" role="status" aria-live="polite">
+        <span className="home-beta-badge">Beta</span>
+        <p className="home-beta-text">
+          Sign-in and payments aren’t available yet—the main Excel → Yardi workflow works here in your browser, free to
+          try.
+        </p>
+      </div>
       <p className="home-intro">
         Excel trial balance or balance sheet → Yardi journal entry file. One month or many—same steps: preview, tweak, export.
         <span className="home-intro-privacy"> Runs in your browser; your file stays on your device.</span>
