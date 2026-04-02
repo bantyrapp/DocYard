@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 const ONBOARDING_STEPS = [
   { id: 'info', title: 'Your information', subtitle: 'Confirm your details' },
   { id: 'preferences', title: 'Preferences', subtitle: 'How you like to work' },
-  { id: 'paywall', title: 'Choose your plan', subtitle: 'Start free, upgrade when you need more' },
-  { id: 'completed', title: "You're all set", subtitle: 'Start using EazyBooks' },
+  { id: 'paywall', title: 'Choose your plan', subtitle: 'Start free; upgrade later if you want Pro' },
+  { id: 'completed', title: "You're all set", subtitle: 'Jump into EazyBookz' },
 ];
 
 export function Onboarding({ user, onComplete }) {
@@ -85,19 +85,19 @@ export function Onboarding({ user, onComplete }) {
             <div className="onboarding-plan-card">
               <p className="onboarding-plan-name">Free</p>
               <p className="onboarding-plan-price">$0</p>
-              <p className="onboarding-plan-desc">Trial balance → journal entry. Offline. Templates.</p>
+              <p className="onboarding-plan-desc">Core export flow, local processing, templates.</p>
             </div>
             <div className="onboarding-plan-card featured">
               <p className="onboarding-plan-name">Pro</p>
               <p className="onboarding-plan-price">$10/mo</p>
-              <p className="onboarding-plan-desc">Everything in Free. Priority support. (Coming soon.)</p>
+              <p className="onboarding-plan-desc">Everything in Free, plus priority support—coming soon.</p>
             </div>
-            <p className="onboarding-paywall-note">You can start with Free and upgrade anytime.</p>
+            <p className="onboarding-paywall-note">Pick Free now; you can upgrade anytime.</p>
           </div>
         )}
 
         {step.id === 'completed' && (
-          <p className="onboarding-completed-text">Your account is ready. Hit Get started to open the app.</p>
+          <p className="onboarding-completed-text">You’re ready—tap Get started for the home screen.</p>
         )}
 
         <button type="button" className="btn btn-primary onboarding-next" onClick={handleNext}>

@@ -168,11 +168,11 @@ export function ParsePreviewTable({
         <p className="parse-preview-hint">
           {isMultiMode
             ? (view === 'parsed'
-              ? 'Original trial balance data from each file, stacked by month (title rows and headers included). Scroll to see all rows.'
-              : 'Yardi import format: one row per journal entry line. Ready for Yardi import. Export when ready.')
+              ? 'Source data from each file, stacked by month (titles and headers kept). Scroll for all rows.'
+              : 'Yardi JE layout—one row per line. Export when it looks right.')
             : (view === 'parsed'
-              ? 'Your file as we read it, including title rows and column headers. Edit cells if needed; switch to Yardi template to export.'
-              : 'Yardi import format: one row per journal entry line. Export to Excel or CSV when ready.')}
+              ? 'What we parsed from your sheet—edit cells here, then switch to Yardi to export.'
+              : 'Yardi-ready rows. Export to Excel or CSV.')}
         </p>
         <div className="parse-preview-actions">
           {isParsed && !isMultiMode && (
@@ -188,8 +188,8 @@ export function ParsePreviewTable({
           <button type="button" className="btn btn-primary" onClick={handleExport}>
             Export to Excel
           </button>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={handleExportCsv} title="Import into Google Sheets via File → Import">
-            Download CSV (Google Sheets)
+          <button type="button" className="btn btn-ghost btn-sm" onClick={handleExportCsv} title="File → Import in Google Sheets">
+            CSV (Sheets)
           </button>
           {!isMultiMode && (
             <button type="button" className="btn btn-ghost btn-sm" onClick={openSaveModal} title="Save to Documents">
@@ -197,7 +197,7 @@ export function ParsePreviewTable({
             </button>
           )}
         </div>
-        <p className="parse-preview-scroll-hint">Scroll horizontally for all columns; scroll down in the table for all rows.</p>
+        <p className="parse-preview-scroll-hint">Scroll the table for more columns and rows.</p>
       </div>
 
       {showSaveModal && (
@@ -208,7 +208,7 @@ export function ParsePreviewTable({
               <button type="button" className="save-doc-modal-close" onClick={() => !saveSuccess && setShowSaveModal(false)} aria-label="Close">×</button>
             </div>
             {saveSuccess ? (
-              <p className="save-doc-modal-thanks">Saved. Find it in Documents.</p>
+              <p className="save-doc-modal-thanks">Saved—open Documents to view it.</p>
             ) : (
               <form className="save-doc-modal-form" onSubmit={(e) => { e.preventDefault(); handleSaveToDocuments(); }}>
                 <label className="save-doc-label" htmlFor="save-doc-label">Label</label>

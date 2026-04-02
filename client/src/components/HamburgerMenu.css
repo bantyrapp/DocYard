@@ -1,0 +1,293 @@
+/* Full-screen navigation overlay */
+.hamburger-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  animation: hamburger-fade-in 0.2s ease;
+}
+
+@keyframes hamburger-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hamburger-overlay-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem 1rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.hamburger-overlay-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.hamburger-overlay-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+}
+
+.hamburger-overlay-name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.hamburger-overlay-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.hamburger-close-pill {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--textMuted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.hamburger-close-pill:hover {
+  color: var(--text);
+  background: var(--surface3);
+  border-color: var(--border-light);
+}
+
+.hamburger-close-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+}
+
+.hamburger-close-icon:hover {
+  background: var(--surface3);
+}
+
+.hamburger-close-icon svg {
+  display: block;
+}
+
+.hamburger-overlay-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hamburger-privacy-banner {
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+  padding: 1.125rem 1.125rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.hamburger-privacy-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--accentMuted);
+  color: var(--accent);
+}
+
+.hamburger-privacy-icon svg {
+  display: block;
+}
+
+.hamburger-privacy-copy {
+  min-width: 0;
+}
+
+.hamburger-privacy-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.hamburger-privacy-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--textMuted);
+}
+
+.hamburger-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--textSubtle);
+  margin: 0 0 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.hamburger-nav-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.hamburger-nav-link,
+.hamburger-nav-action {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition);
+}
+
+.hamburger-nav-link:hover,
+.hamburger-nav-action:hover {
+  background: var(--surface2);
+}
+
+.hamburger-nav-link:focus-visible,
+.hamburger-nav-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hamburger-nav-muted {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--textMuted);
+}
+
+.hamburger-theme-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.25rem 0;
+}
+
+.hamburger-theme-label {
+  font-size: 0.8125rem;
+  color: var(--textMuted);
+}
+
+.hamburger-theme-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--surface2);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.hamburger-theme-toggle button {
+  padding: 0.45rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--textMuted);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.hamburger-theme-toggle button:hover {
+  color: var(--text);
+}
+
+.hamburger-theme-toggle button.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.hamburger-bottom-close {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom, 0));
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.hamburger-bottom-close button {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.hamburger-bottom-close button:hover {
+  background: var(--surface3);
+  border-color: var(--border-light);
+}
+
+.hamburger-dev {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+}
+
+.hamburger-dev-note {
+  font-size: 0.75rem;
+  color: var(--textSubtle);
+  margin: 0 0 0.5rem;
+}
+
+.hamburger-dev-btn {
+  width: 100%;
+  font-size: 0.8125rem;
+}

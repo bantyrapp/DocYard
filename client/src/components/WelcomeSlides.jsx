@@ -5,22 +5,22 @@ import { IconChart, IconSparkle, IconLock, IconBuilding } from './icons/SlideIco
 const SLIDES = [
   {
     title: 'Trial balance → journal entry',
-    body: 'Upload your Excel trial balance. Set post month and journal date. Get an import-ready file. No server upload—runs in your browser.',
+    body: 'Upload Excel, set period and date, download a Yardi-ready file. Runs in your browser—no upload.',
     Icon: IconChart,
   },
   {
     title: 'When you sign up',
-    body: 'Create an account to save your preferences, access templates from any device, and get updates. Free to start.',
+    body: 'Save preferences, sync across devices, and get product updates. Start free.',
     Icon: IconSparkle,
   },
   {
     title: 'When you sign in',
-    body: 'Your post month defaults, template history (coming soon), and a consistent experience across desktop and web.',
+    body: 'Remembers your defaults and keeps the same experience on web and desktop.',
     Icon: IconLock,
   },
   {
     title: 'Built for property accounting',
-    body: 'Offline-first. Excel in, Excel out. Debits = credits. We’re not affiliated with any third-party software.',
+    body: 'Excel in, Excel out. Balanced debits and credits. Independent—not affiliated with Yardi or others.',
     Icon: IconBuilding,
   },
 ];
@@ -75,7 +75,7 @@ export function WelcomeSlides({ onSignIn }) {
           </button>
         </div>
 
-        <p className="welcome-cta-hint">Create an account or sign in to get started.</p>
+        <p className="welcome-cta-hint">Sign in or create an account to continue.</p>
         <div className="welcome-cta-buttons">
           <button type="button" className="btn btn-primary welcome-signin" onClick={() => { onSignIn(); }}>
             Sign in (dev)

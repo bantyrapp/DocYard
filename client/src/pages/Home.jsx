@@ -63,7 +63,10 @@ export function Home() {
 
   return (
     <div className="home-page home-page--input">
-      <p className="home-intro">Turn trial balance or balance sheet Excel files into Yardi-ready journal entries. One file or a full year—same flow. Preview both the original and Yardi format, then export. Processed in your browser; your data never leaves your device.</p>
+      <p className="home-intro">
+        Excel trial balance or balance sheet → Yardi journal entry file. One month or many—same steps: preview, tweak, export.
+        <span className="home-intro-privacy"> Runs in your browser; your file stays on your device.</span>
+      </p>
       <NerdyHints />
       <UploadZone
         postMonth={exportPostMonth}

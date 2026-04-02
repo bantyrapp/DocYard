@@ -33,7 +33,7 @@ export function Admin() {
     <div className="page admin-page">
       <div className="page-inner admin-inner">
         <h1 className="page-title">Admin</h1>
-        <p className="admin-hint">Enter your admin key to view download stats.</p>
+        <p className="admin-hint">Admin key required for export stats.</p>
 
         <form className="admin-form" onSubmit={handleLoad}>
           <input
@@ -55,7 +55,7 @@ export function Admin() {
           <div className="admin-stats">
             <div className="admin-stat-card">
               <p className="admin-stat-value">{stats.exportCount ?? 0}</p>
-              <p className="admin-stat-label">Total exports (downloads)</p>
+              <p className="admin-stat-label">Total exports</p>
             </div>
             {stats.recent && stats.recent.length > 0 && (
               <div className="admin-recent">
@@ -73,7 +73,7 @@ export function Admin() {
         )}
 
         <p className="admin-back">
-          <Link to="/">← Back to EazyBooks</Link>
+          <Link to="/">← Back to home</Link>
         </p>
       </div>
     </div>

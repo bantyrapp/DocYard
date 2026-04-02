@@ -154,12 +154,12 @@ export function Documents() {
       <div className="page-inner documents-inner">
         <header className="documents-header">
           <h1 className="documents-title">Documents</h1>
-          <p className="documents-intro">Saved documents: parsed trial balances and Yardi journal entry exports. Search or sort below.</p>
+          <p className="documents-intro">Saved parses and exports. Search or sort below.</p>
         </header>
         {docs.length === 0 ? (
           <div className="documents-empty">
             <p className="documents-empty-text">No documents yet.</p>
-            <p className="documents-empty-hint">On Home, upload a file; then in the parse preview click Save to Documents to save it here.</p>
+            <p className="documents-empty-hint">From Home, upload a file—then use <strong>Save to Documents</strong> in the preview.</p>
           </div>
         ) : (
           <>

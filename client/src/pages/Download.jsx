@@ -21,10 +21,10 @@ export function Download() {
       <div className="page-inner download-inner">
         <h1 className="page-title download-page-title">
           <span className="download-page-title-icon" aria-hidden><DownloadIcon size={28} /></span>
-          Download EazyBooks
+          Download EazyBookz
         </h1>
         <p className="download-intro">
-          Trial balance & balance sheet → Yardi journal entries. One file or full year. Free desktop app — works offline.
+          Desktop app for the same flow as the site—offline once installed. One month or a full year of files.
         </p>
 
         <div className="download-grid">
@@ -38,7 +38,7 @@ export function Download() {
                 Download for Windows
               </a>
             ) : (
-              <p className="download-placeholder">Build it free (see below)</p>
+              <p className="download-placeholder">Build from source (below)</p>
             )}
           </div>
 
@@ -52,7 +52,7 @@ export function Download() {
                 Download for Mac
               </a>
             ) : (
-              <p className="download-placeholder">Build it free (see below)</p>
+              <p className="download-placeholder">Build from source (below)</p>
             )}
           </div>
 
@@ -66,27 +66,27 @@ export function Download() {
                 Download for Linux
               </a>
             ) : (
-              <p className="download-placeholder">Build it free (see below)</p>
+              <p className="download-placeholder">Build from source (below)</p>
             )}
           </div>
         </div>
 
         <div className="download-build-section">
-          <h2 className="download-build-title">Build it yourself (free)</h2>
+          <h2 className="download-build-title">Build from source</h2>
           <p className="download-build-intro">
-            With Node.js: clone the repo, run <code>npm install</code> then <code>npm run electron:build</code>. Output is in <code>release/</code>.
+            Needs Node.js: <code>npm install</code>, then <code>npm run electron:build</code>. Installers land in <code>release/</code>.
           </p>
           <p className="download-build-note">
-            Windows: <code>release\EazyBooks Setup *.exe</code>. Mac: <code>release/*.dmg</code>. Linux: <code>release/*.AppImage</code>.
+            Windows: <code>*.exe</code> · Mac: <code>*.dmg</code> · Linux: <code>*.AppImage</code>
           </p>
         </div>
 
         <p className="download-note">
-          Or use EazyBooks in your browser — no download or sign-in required.
+          Prefer the web app? Use EazyBookz in the browser—no install required.
         </p>
 
         <p className="download-back">
-          <Link to="/">← Back to EazyBooks</Link>
+          <Link to="/">← Back to home</Link>
         </p>
       </div>
     </div>

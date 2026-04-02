@@ -79,7 +79,7 @@ export function FeedbackSection({ context = 'general', headerRow } = {}) {
     return (
       <section className="feedback-section" aria-live="polite">
         <div className="feedback-thanks-box">
-          <p className="feedback-thanks">Thanks. Your feedback helps us improve.</p>
+          <p className="feedback-thanks">Thanks—we read every note.</p>
         </div>
       </section>
     );
@@ -89,7 +89,7 @@ export function FeedbackSection({ context = 'general', headerRow } = {}) {
     <section className="feedback-section feedback-section--card">
       <div className="feedback-line" />
       <h2 className="feedback-heading">How was that?</h2>
-      <p className="feedback-hint">Rate 1-5 so we know exactly what to improve. Your feedback updates the parser for everyone.</p>
+      <p className="feedback-hint">Quick 1–5 rating. Low scores help us tune the parser for everyone.</p>
       <form className="feedback-form" onSubmit={handleSubmit}>
         <div className="feedback-rating-row">
           <span className="feedback-rating-label">Rating</span>
@@ -118,7 +118,7 @@ export function FeedbackSection({ context = 'general', headerRow } = {}) {
         {showCategory && (
           <>
             <label className="feedback-message-label" htmlFor="feedback-category">
-              What was wrong? (helps us fix the right thing)
+              What went wrong?
             </label>
             <select
               id="feedback-category"

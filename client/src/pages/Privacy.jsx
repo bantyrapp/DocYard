@@ -10,17 +10,17 @@ export function Privacy() {
 
         <section className="terms-section">
           <h2>1. Who we are</h2>
-          <p>EazyBooks (“we,” “our”) provides trial balance and balance sheet to Yardi journal entry conversion (single file or multi-month). This policy describes how we handle your information.</p>
+          <p>EazyBookz (“we,” “our”) offers trial balance and balance sheet → Yardi JE conversion. This policy explains how we handle information.</p>
         </section>
 
         <section className="terms-section">
           <h2>2. Data processed in your browser</h2>
-          <p>When you use the main conversion flow (upload Excel and download the result), your file is processed entirely in your browser. We do not receive, store, or transmit the contents of your file for that flow. Your data never leaves your device unless you choose to use features that send data to our servers (e.g. optional cloud sync or support).</p>
+          <p>For the main upload → download flow, processing stays in your browser—we don’t receive your file contents. Data leaves your device only if you use features that explicitly call our servers (e.g. account, payments, support).</p>
         </section>
 
         <section className="terms-section">
           <h2>3. Information we collect</h2>
-          <p>We may collect: (a) account information you provide (email, name) when you sign up; (b) usage and analytics data (e.g. pages visited, errors) to improve the service; (c) payment information processed by Stripe (we do not store full card details). We do not sell your personal information.</p>
+          <p>We may collect account details you give us, usage/analytics to improve the product, and payment data via Stripe (we don’t store full card numbers). We don’t sell personal information.</p>
         </section>
 
         <section className="terms-section">
@@ -35,11 +35,11 @@ export function Privacy() {
 
         <section className="terms-section">
           <h2>6. Contact</h2>
-          <p>For privacy questions or requests, use the contact information provided on the EazyBooks website.</p>
+          <p>Privacy questions: use the contact on this site.</p>
         </section>
 
         <p className="terms-back">
-          <Link to="/">← Back to EazyBooks</Link>
+          <Link to="/">← Back to home</Link>
         </p>
       </div>
     </div>

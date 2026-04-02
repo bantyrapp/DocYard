@@ -119,33 +119,29 @@ export function Layout() {
 
       <footer className="app-footer">
         <div className="app-footer-inner">
-          <div className="footer-line" />
-          <p className="footer-trust">
-            <span className="footer-trust-icon" aria-hidden>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </span>
-            Processed in your browser · your file never leaves your device.
-          </p>
-          <p className="footer-coming-next">
-            <strong>Coming next:</strong> GL name matching — drop their trial balance, match to your chart of accounts, get Yardi import with your account numbers.
-          </p>
-          <div className="footer-links">
-            <Link to="/">Home</Link>
-            <span className="footer-dot" aria-hidden>·</span>
-            <Link to="/terms">Terms</Link>
-            <span className="footer-dot" aria-hidden>·</span>
-            <Link to="/privacy">Privacy</Link>
-            <span className="footer-dot" aria-hidden>·</span>
-            <Link to="/pricing">Pricing</Link>
-            <span className="footer-dot" aria-hidden>·</span>
-            <Link to="/documents">Documents</Link>
-            <span className="footer-dot" aria-hidden>·</span>
-            <Link to="/download">Download</Link>
+          <div className="footer-privacy-strip" role="status">
+            <span className="footer-privacy-dot" aria-hidden />
+            <span>Local processing — your file never leaves your device</span>
           </div>
+
+          <div className="footer-cols">
+            <div className="footer-col">
+              <span className="footer-col-label">Product</span>
+              <Link to="/">Home</Link>
+              <Link to="/documents">Documents</Link>
+              <Link to="/download">Download</Link>
+              <Link to="/pricing">Pricing</Link>
+            </div>
+            <div className="footer-col">
+              <span className="footer-col-label">Legal</span>
+              <Link to="/terms">Terms</Link>
+              <Link to="/privacy">Privacy</Link>
+            </div>
+          </div>
+
           <div className="footer-bottom">
             <span className="footer-logo">EazyBookz</span>
-            <span className="footer-copy"> · Trial balance & balance sheet → Yardi journal entries</span>
-            <span className="footer-year"> · © {new Date().getFullYear()}</span>
+            <span className="footer-year">© {new Date().getFullYear()}</span>
           </div>
         </div>
       </footer>

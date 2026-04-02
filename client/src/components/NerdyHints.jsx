@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 const HINTS = [
-  { text: 'Upload a trial balance or balance sheet; we output Yardi-format journal entries (one row per line).', tag: 'feature' },
-  { text: 'Single file = one JE file. Multiple files (e.g. 12 months) = one combined workbook.', tag: 'feature' },
-  { text: 'Processed in your browser. Your file never leaves your device.', tag: 'privacy' },
-  { text: 'We auto-detect from column headers: Account, Debit, Credit (or Balance).', tag: 'format' },
-  { text: 'Post month = period (MM/YYYY). Journal date = date on each line. Property from filename or row 4.', tag: 'tips' },
-  { text: 'Coming next: GL name matching — map their chart of accounts to yours.', tag: 'soon' },
+  { text: 'Trial balance or balance sheet in → Yardi JE rows out (one line per entry).', tag: 'feature' },
+  { text: 'One file = one export. Many files = one combined workbook by month.', tag: 'feature' },
+  { text: 'All processing happens locally—nothing is uploaded.', tag: 'privacy' },
+  { text: 'We look for Account, Debit, Credit (or Balance) in your headers.', tag: 'format' },
+  { text: 'Post month = accounting period. Journal date = line date. Property often comes from the filename.', tag: 'tips' },
+  { text: 'Next up: match their GL names to your chart of accounts.', tag: 'soon' },
 ];
 
 export function NerdyHints() {

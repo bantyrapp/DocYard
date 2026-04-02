@@ -18,7 +18,7 @@ function getLastDayOfMonthYmdLocal(postMonth) {
 }
 
 const DOC_TYPES = [
-  { value: 'auto', label: 'Auto (trial balance or balance sheet)' },
+  { value: 'auto', label: 'Auto-detect' },
   { value: 'trial_balance', label: 'Trial balance' },
   { value: 'balance_sheet', label: 'Balance sheet' },
 ];
@@ -83,7 +83,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
             propertyName: propertyName?.trim() || undefined,
           });
           downloadBlob(blob, 'yardi_je_import.xlsx');
-          setSuccess('Downloaded. You can also export again from the table below.');
+          setSuccess('Downloaded. Re-export or edit from the table below.');
           setTimeout(() => setSuccess(''), 5000);
         }
       } else {
@@ -132,7 +132,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
       <div className="upload-how-it-works">
         <h2 className="upload-how-heading">How it works</h2>
         <p className="upload-how-p">
-          Set your options below, then drop or select Excel file(s). <strong>One file</strong> = one month; you’ll see the original sheet and the Yardi format, then export when ready. <strong>Multiple files</strong> (e.g. 12 months) = we combine them by month into one workbook and show both views. Everything runs in your browser—your data never leaves your device.
+          Pick options, then add Excel files. <strong>One file</strong> = one period, with parsed and Yardi views side by side. <strong>Several files</strong> = we merge by month into one workbook. All local—no upload.
         </p>
       </div>
 
@@ -145,9 +145,9 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
               checked={downloadImmediately}
               onChange={(e) => setDownloadImmediately(e.target.checked)}
             />
-            <span>Also download file immediately (single file only)</span>
+            <span>Download right away (single file only)</span>
           </label>
-          <span className="download-immediately-hint">When on, we still show the table below so you can export again or save to Documents.</span>
+          <span className="download-immediately-hint">You still get the table below to re-export or save.</span>
         </div>
         <div className="doc-type-row">
           <label htmlFor="doc-type">Document type</label>
@@ -156,7 +156,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
             className="doc-type-select"
             value={docType}
             onChange={(e) => setDocType(e.target.value)}
-            title="We auto-detect from column headers (Account, Debit, Credit or Balance)."
+            title="Uses column headers: Account, Debit, Credit, or Balance."
           >
             {DOC_TYPES.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -178,7 +178,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
                 setPostMonth(newMonth);
                 if (setJournalDate) setJournalDate(getLastDayOfMonthYmdLocal(newMonth));
               }}
-              title="Period for entries (single file). For multiple files we use the filename, e.g. 1.2025 Fitz TB.xlsx → 01/2025."
+              title="Accounting period (MM/YYYY). Multi-file: we also read the month from each filename when possible."
             />
           </div>
           <div className="upload-option">
@@ -188,7 +188,7 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
               className="post-date-input"
               value={journalDate || ''}
               onChange={(e) => setJournalDate?.(e.target.value || '')}
-              title="Date on each journal entry line (e.g. last day of month)."
+              title="Date stamped on each JE line—often month-end."
             />
           </div>
         </div>
@@ -198,10 +198,10 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
             id="property-name-input"
             type="text"
             className="property-name-input"
-            placeholder="e.g. Fitz (optional; we detect from file or sheet)"
+            placeholder="e.g. Fitz (optional)"
             value={propertyName}
             onChange={(e) => setPropertyName(e.target.value)}
-            title="Used in the Property_Name column. We detect from filename or sheet row if blank."
+            title="Fills Property_Name; if empty we guess from the file name or sheet."
           />
         </div>
       </div>
@@ -233,8 +233,8 @@ export function UploadZone({ postMonth, setPostMonth, journalDate, setJournalDat
           </div>
         ) : (
           <>
-            <div className="label">Drop Excel file(s) here or click to choose</div>
-            <div className="hint">One file = one month. Multiple files = we combine by month into one Yardi workbook. Trial balance or balance sheet.</div>
+            <div className="label">Drop Excel here or click to browse</div>
+            <div className="hint">.xlsx / .xls · one month per file, or many files merged by month</div>
           </>
         )}
       </div>

@@ -33,7 +33,7 @@ export function Verification({ onVerify }) {
     <div className="page verification-page">
       <div className="page-inner verification-inner">
         <h1 className="page-title">Create account</h1>
-        <p className="verification-intro">Verify your identity. Choose email, Gmail, or phone.</p>
+        <p className="verification-intro">Sign up with email, Gmail, or phone.</p>
 
         <form className="verification-form" onSubmit={handleContinueWithEmail}>
           <div className="input-group">

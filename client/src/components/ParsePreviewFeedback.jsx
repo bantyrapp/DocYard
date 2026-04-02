@@ -74,7 +74,7 @@ export function ParsePreviewFeedback({ docType, detectedType, headerRow }) {
   if (submitted) {
     return (
       <div className="parse-preview-feedback parse-preview-feedback--thanks">
-        <p className="parse-preview-feedback-thanks">Thanks. Your feedback helps us improve.</p>
+        <p className="parse-preview-feedback-thanks">Thanks—we’ll use this to improve parsing.</p>
       </div>
     );
   }
@@ -82,7 +82,7 @@ export function ParsePreviewFeedback({ docType, detectedType, headerRow }) {
   return (
     <div className="parse-preview-feedback">
       <p className="parse-preview-feedback-heading">How did we do?</p>
-      <p className="parse-preview-feedback-hint">Rate 1–5 and pick a category if something was wrong; we use this to improve column detection.</p>
+      <p className="parse-preview-feedback-hint">Rate 1–5. If it’s off, pick a category so we can fix column detection.</p>
       <form className="parse-preview-feedback-form" onSubmit={handleSubmit}>
         <div className="parse-preview-feedback-scale-wrap">
           <div className="parse-preview-feedback-scale" role="group" aria-label="Rating 1 to 5">

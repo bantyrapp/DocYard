@@ -10,12 +10,12 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>1. Agreement</h2>
-          <p>By using EazyBooks (“Service”), you agree to these Terms of Service. If you do not agree, do not use the Service.</p>
+          <p>By using EazyBookz (“Service”), you agree to these Terms. If you disagree, don’t use the Service.</p>
         </section>
 
         <section className="terms-section">
           <h2>2. Description of Service</h2>
-          <p>EazyBooks converts trial balance and balance sheet Excel files into Yardi-format journal entry imports—single month or full year. The Service is for real estate and property accounting. EazyBooks is not affiliated with, endorsed by, or connected to Yardi or any other property management software.</p>
+          <p>EazyBookz turns trial balance and balance sheet Excel files into Yardi-style journal entry imports (one month or many). Built for property accounting. We are not affiliated with Yardi or other vendors.</p>
         </section>
 
         <section className="terms-section">
@@ -40,7 +40,7 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>7. Limitation of Liability</h2>
-          <p>To the fullest extent permitted by law, EazyBooks and its providers shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
+          <p>To the fullest extent permitted by law, EazyBookz and its providers are not liable for indirect, incidental, or consequential damages from your use of the Service.</p>
         </section>
 
         <section className="terms-section">
@@ -55,11 +55,11 @@ export function Terms() {
 
         <section className="terms-section">
           <h2>10. Contact</h2>
-          <p>Questions about these Terms may be sent to the contact address provided on the EazyBooks website.</p>
+          <p>Questions about these Terms: use the contact on this site.</p>
         </section>
 
         <p className="terms-back">
-          <Link to="/">← Back to EazyBooks</Link>
+          <Link to="/">← Back to home</Link>
         </p>
       </div>
     </div>
