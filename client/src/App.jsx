@@ -9,6 +9,7 @@ import { Privacy } from './pages/Privacy';
 import { Admin } from './pages/Admin';
 import { Download } from './pages/Download';
 import { Documents } from './pages/Documents';
+import { About } from './pages/About';
 import './App.css';
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="admin" element={<Admin />} />
           <Route path="documents" element={<Documents />} />
           <Route path="download" element={<Download />} />
+          <Route path="about" element={<About />} />
         </Route>
       </Routes>
     </AuthProvider>

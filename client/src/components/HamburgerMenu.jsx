@@ -113,6 +113,9 @@ export function HamburgerMenu({ open, onClose, theme, onThemeChange, signedIn, o
             <Link to="/pricing" className="hamburger-nav-link" onClick={onClose}>
               Pricing
             </Link>
+            <Link to="/about" className="hamburger-nav-link" onClick={onClose}>
+              About
+            </Link>
           </nav>
         </div>
 

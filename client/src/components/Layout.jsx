@@ -59,6 +59,7 @@ export function Layout() {
             <Link to="/documents" className="app-bar-link">Documents</Link>
             <Link to="/download" className="app-bar-link">Download</Link>
             <Link to="/pricing" className="app-bar-link">Pricing</Link>
+            <Link to="/about" className="app-bar-link">About</Link>
             <Link to="/terms" className="app-bar-link">Terms</Link>
             <Link to="/privacy" className="app-bar-link">Privacy</Link>
           </nav>
@@ -131,6 +132,7 @@ export function Layout() {
               <Link to="/documents">Documents</Link>
               <Link to="/download">Download</Link>
               <Link to="/pricing">Pricing</Link>
+              <Link to="/about">About</Link>
             </div>
             <div className="footer-col">
               <span className="footer-col-label">Legal</span>

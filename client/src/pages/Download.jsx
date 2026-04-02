@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+/* Platform marks: SVGs in /public from Simple Icons (MIT) — https://simpleicons.org */
+
 const WIN_URL = import.meta.env.VITE_DOWNLOAD_WIN_URL || '';
 const MAC_URL = import.meta.env.VITE_DOWNLOAD_MAC_URL || '';
 const LINUX_URL = import.meta.env.VITE_DOWNLOAD_LINUX_URL || '';
 
-function DownloadIcon({ size = 20, className = '' }) {
+function DownloadArrowIcon({ size = 18, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -15,75 +17,75 @@ function DownloadIcon({ size = 20, className = '' }) {
   );
 }
 
+const PLATFORMS = [
+  {
+    id: 'windows',
+    name: 'Windows',
+    tag: '10 & 11',
+    detail: '64-bit installer',
+    url: WIN_URL,
+    icon: '/platform-windows.svg',
+    btnLabel: 'Download for Windows',
+  },
+  {
+    id: 'macos',
+    name: 'macOS',
+    tag: 'Apple Silicon & Intel',
+    detail: 'Disk image (.dmg)',
+    url: MAC_URL,
+    icon: '/platform-apple.svg',
+    btnLabel: 'Download for Mac',
+  },
+  {
+    id: 'linux',
+    name: 'Linux',
+    tag: '64-bit',
+    detail: 'AppImage',
+    url: LINUX_URL,
+    icon: '/platform-linux.svg',
+    btnLabel: 'Download for Linux',
+  },
+];
+
 export function Download() {
   return (
     <div className="page download-page">
       <div className="page-inner download-inner">
-        <h1 className="page-title download-page-title">
-          <span className="download-page-title-icon" aria-hidden><DownloadIcon size={28} /></span>
-          Download EazyBookz
-        </h1>
-        <p className="download-intro">
-          Desktop app for the same flow as the site—offline once installed. One month or a full year of files.
-        </p>
+        <header className="download-hero">
+          <p className="download-eyebrow">Desktop app</p>
+          <h1 className="page-title download-title">Download EazyBookz</h1>
+          <p className="download-intro">
+            Same trial balance → Yardi workflow as the web app, packaged for your computer. Works offline after install.
+          </p>
+        </header>
 
         <div className="download-grid">
-          <div className="download-card">
-            <span className="download-icon" aria-hidden>🪟</span>
-            <h2 className="download-platform">Windows</h2>
-            <p className="download-desc">Windows 10 or 11</p>
-            {WIN_URL ? (
-              <a href={WIN_URL} className="btn btn-primary download-btn" download>
-                <DownloadIcon size={18} className="download-btn-icon" />
-                Download for Windows
-              </a>
-            ) : (
-              <p className="download-placeholder">Build from source (below)</p>
-            )}
-          </div>
-
-          <div className="download-card">
-            <span className="download-icon" aria-hidden>🍎</span>
-            <h2 className="download-platform">macOS</h2>
-            <p className="download-desc">Apple Silicon or Intel</p>
-            {MAC_URL ? (
-              <a href={MAC_URL} className="btn btn-primary download-btn" download>
-                <DownloadIcon size={18} className="download-btn-icon" />
-                Download for Mac
-              </a>
-            ) : (
-              <p className="download-placeholder">Build from source (below)</p>
-            )}
-          </div>
-
-          <div className="download-card">
-            <span className="download-icon" aria-hidden>🐧</span>
-            <h2 className="download-platform">Linux</h2>
-            <p className="download-desc">AppImage (64-bit)</p>
-            {LINUX_URL ? (
-              <a href={LINUX_URL} className="btn btn-primary download-btn" download>
-                <DownloadIcon size={18} className="download-btn-icon" />
-                Download for Linux
-              </a>
-            ) : (
-              <p className="download-placeholder">Build from source (below)</p>
-            )}
-          </div>
+          {PLATFORMS.map((p) => (
+            <article key={p.id} className="download-card" data-platform={p.id}>
+              <div className={`download-platform-mark download-platform-mark--${p.id}`} aria-hidden>
+                <img src={p.icon} alt="" width={28} height={28} className="download-os-img" />
+              </div>
+              <h2 className="download-platform">{p.name}</h2>
+              <p className="download-tag">{p.tag}</p>
+              <p className="download-desc">{p.detail}</p>
+              {p.url ? (
+                <a href={p.url} className="btn btn-primary download-btn" download>
+                  <DownloadArrowIcon size={18} className="download-btn-icon" />
+                  {p.btnLabel}
+                </a>
+              ) : (
+                <p className="download-soon">Installer coming soon</p>
+              )}
+            </article>
+          ))}
         </div>
 
-        <div className="download-build-section">
-          <h2 className="download-build-title">Build from source</h2>
-          <p className="download-build-intro">
-            Needs Node.js: <code>npm install</code>, then <code>npm run electron:build</code>. Installers land in <code>release/</code>.
-          </p>
-          <p className="download-build-note">
-            Windows: <code>*.exe</code> · Mac: <code>*.dmg</code> · Linux: <code>*.AppImage</code>
-          </p>
+        <div className="download-web-cta">
+          <p>No install needed?</p>
+          <Link to="/" className="download-web-link">
+            Use EazyBookz in your browser →
+          </Link>
         </div>
-
-        <p className="download-note">
-          Prefer the web app? Use EazyBookz in the browser—no install required.
-        </p>
 
         <p className="download-back">
           <Link to="/">← Back to home</Link>
